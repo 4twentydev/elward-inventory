@@ -1,0 +1,56 @@
+{
+  "name": "elward-inventory",
+  "version": "1.0.0",
+  "description": "Inventory management system for construction materials and tools",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "biome lint ./src",
+    "format": "biome format --write ./src",
+    "check": "biome check --write ./src",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "keywords": [
+    "inventory",
+    "construction",
+    "next.js"
+  ],
+  "author": "Elward Systems Corporation",
+  "license": "MIT",
+  "packageManager": "pnpm@10.27.0",
+  "dependencies": {
+    "@vercel/postgres": "^0.10.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "drizzle-orm": "^0.45.1",
+    "lucide-react": "^0.562.0",
+    "next": "^16.1.1",
+    "postgres": "^3.4.8",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "tailwind-merge": "^3.4.0",
+    "uuid": "^13.0.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.11",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^25.0.3",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@types/uuid": "^11.0.0",
+    "autoprefixer": "^10.4.23",
+    "drizzle-kit": "^0.31.8",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3"
+  }
+}
