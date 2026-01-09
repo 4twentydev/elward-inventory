@@ -7,8 +7,6 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Modal } from "./ui/modal";
 import { Select } from "./ui/select";
-import { useInventory } from "./inventory-context";
-import type { InventoryItem, ItemCategory } from "@/types";
 import {
 	getLocationTermCapitalized,
 	getLocationPlaceholder,
