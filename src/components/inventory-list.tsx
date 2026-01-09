@@ -13,6 +13,7 @@ import { TransactionModal } from "./transaction-modal";
 import { CountModal } from "./count-modal";
 import { ItemHistoryModal } from "./item-history-modal";
 import { AICountModal } from "./ai-count-modal";
+import { AssistantModal } from "./assistant-modal";
 import { QuarterlyCountMode } from "./quarterly-count-mode";
 import { LabelModal } from "./label-modal";
 import { AnalyticsDashboard } from "./analytics-dashboard";
@@ -39,6 +40,7 @@ import {
 	ListChecks,
 	Printer,
 	Users,
+	MessageSquare,
 } from "lucide-react";
 import type { InventoryItem, ItemCategory } from "@/types";
 
@@ -79,6 +81,7 @@ export function InventoryList() {
 	const [showImportModal, setShowImportModal] = useState(false);
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [showAICountModal, setShowAICountModal] = useState(false);
+	const [showAssistant, setShowAssistant] = useState(false);
 	const [showCountMode, setShowCountMode] = useState(false);
 	const [showLabelModal, setShowLabelModal] = useState(false);
 	const [showAnalytics, setShowAnalytics] = useState(false);
@@ -260,6 +263,10 @@ export function InventoryList() {
 					<Button variant="secondary" onClick={() => setShowAICountModal(true)}>
 						<Sparkles className="w-4 h-4" />
 						AI Count
+					</Button>
+					<Button variant="secondary" onClick={() => setShowAssistant(true)}>
+						<MessageSquare className="w-4 h-4" />
+						Assistant
 					</Button>
 					<div className="flex-1" />
 					<Button variant="ghost" onClick={() => setShowAnalytics(true)}>
@@ -487,6 +494,7 @@ export function InventoryList() {
 				item={selectedItem}
 			/>
 			<AICountModal isOpen={showAICountModal} onClose={() => setShowAICountModal(false)} />
+			<AssistantModal isOpen={showAssistant} onClose={() => setShowAssistant(false)} />
 			<QuarterlyCountMode isOpen={showCountMode} onClose={() => setShowCountMode(false)} />
 			<LabelModal
 				isOpen={showLabelModal}

@@ -56,18 +56,18 @@ export function parseExcelFile(buffer: ArrayBuffer): ImportResult {
 		const headers = (data[0] as string[]).map((h) => h?.toString() || "");
 
 		// Find column indices
-		const nameIdx = findColumnIndex(headers, ["name", "item", "item name", "description", "product"]);
+		const nameIdx = findColumnIndex(headers, ["name", "item", "item name", "description", "product", "part_number", "part number", "job", "job_number", "tent", "pallet_number", "row"]);
 		const categoryIdx = findColumnIndex(headers, ["category", "type", "cat"]);
-		const quantityIdx = findColumnIndex(headers, ["quantity", "qty", "count", "stock", "on hand"]);
-		const locationIdx = findColumnIndex(headers, ["location", "loc", "bin", "warehouse"]);
+		const quantityIdx = findColumnIndex(headers, ["quantity", "qty", "count", "stock", "on hand", "total", "each_quantity"]);
+		const locationIdx = findColumnIndex(headers, ["location", "loc", "bin", "warehouse", "tent"]);
 		const supplierIdx = findColumnIndex(headers, ["supplier", "vendor", "manufacturer"]);
 		const reorderIdx = findColumnIndex(headers, ["reorder", "reorder level", "min", "minimum"]);
-		const notesIdx = findColumnIndex(headers, ["notes", "note", "comments", "description"]);
-		const skuIdx = findColumnIndex(headers, ["sku", "part number", "part", "code", "item number"]);
+		const notesIdx = findColumnIndex(headers, ["notes", "note", "comments", "description", "color", "size", "thickness", "unit"]);
+		const skuIdx = findColumnIndex(headers, ["sku", "part number", "part_number", "part", "code", "item number", "pallet_number"]);
 		const costIdx = findColumnIndex(headers, ["cost", "price", "unit cost", "unit price"]);
 
 		if (nameIdx === -1) {
-			return { success: false, imported: 0, errors: ["Could not find 'Name' or 'Item' column"] };
+			return { success: false, imported: 0, errors: ["Could not find a name column (name, part_number, job, job_number, tent, pallet_number, row, etc.)"] };
 		}
 
 		const items: InventoryItem[] = [];
@@ -146,16 +146,16 @@ export function parseCSVFile(content: string): ImportResult {
 		};
 
 		const headers = parseCSVLine(lines[0]);
-		const nameIdx = findColumnIndex(headers, ["name", "profile", "item", "description"]);
+		const nameIdx = findColumnIndex(headers, ["name", "profile", "item", "description", "part_number", "part number", "job", "job_number", "tent", "pallet_number", "row"]);
 		const categoryIdx = findColumnIndex(headers, ["category", "type"]);
-		const quantityIdx = findColumnIndex(headers, ["quantity", "qty", "count"]);
-		const locationIdx = findColumnIndex(headers, ["location", "loc"]);
+		const quantityIdx = findColumnIndex(headers, ["quantity", "qty", "count", "total", "each_quantity"]);
+		const locationIdx = findColumnIndex(headers, ["location", "loc", "tent"]);
 		const supplierIdx = findColumnIndex(headers, ["supplier", "vendor"]);
-		const notesIdx = findColumnIndex(headers, ["notes", "note"]);
-		const skuIdx = findColumnIndex(headers, ["sku", "part", "code"]);
+		const notesIdx = findColumnIndex(headers, ["notes", "note", "color", "size", "thickness", "unit"]);
+		const skuIdx = findColumnIndex(headers, ["sku", "part", "code", "part_number", "part number", "pallet_number"]);
 
 		if (nameIdx === -1) {
-			return { success: false, imported: 0, errors: ["Could not find 'Name' or 'Profile' column"] };
+			return { success: false, imported: 0, errors: ["Could not find a name column (name, part_number, job, job_number, tent, pallet_number, row, etc.)"] };
 		}
 
 		const items: InventoryItem[] = [];
