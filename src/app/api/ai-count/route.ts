@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
 	try {
@@ -24,7 +24,8 @@ export async function POST(request: NextRequest) {
 
 		// Extract base64 data from data URL
 		const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-		const mediaType = image.match(/^data:(image\/\w+);base64,/)?.[1] || "image/jpeg";
+		const mediaType =
+			image.match(/^data:(image\/\w+);base64,/)?.[1] || "image/jpeg";
 
 		// Call Claude API with vision
 		const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -105,7 +106,7 @@ Do not include any other text before or after the JSON.`,
 		console.error("AI count error:", error);
 		return NextResponse.json(
 			{ error: error instanceof Error ? error.message : "Analysis failed" },
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }

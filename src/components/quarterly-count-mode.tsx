@@ -1,25 +1,25 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useInventory } from "./inventory-context";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Select } from "./ui/select";
-import { Badge } from "./ui/badge";
-import { Card, CardHeader, CardTitle } from "./ui/card";
-import { Modal } from "./ui/modal";
 import {
-	ClipboardCheck,
-	Check,
 	AlertTriangle,
-	ChevronRight,
-	Search,
 	ArrowLeft,
 	BarChart3,
-	Clock,
+	Check,
 	CheckCircle2,
+	ChevronRight,
+	ClipboardCheck,
+	Clock,
+	Search,
 } from "lucide-react";
+import { useMemo, useState } from "react";
 import type { InventoryItem, ItemCategory } from "@/types";
+import { useInventory } from "./inventory-context";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Card, CardHeader, CardTitle } from "./ui/card";
+import { Input } from "./ui/input";
+import { Modal } from "./ui/modal";
+import { Select } from "./ui/select";
 import { getLocationTerm } from "@/lib/location-terminology";
 
 interface CountModeProps {
@@ -49,14 +49,20 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 	const { items, recordCount, currentUser } = useInventory();
 
 	const [sessionName, setSessionName] = useState(
-		`Q${Math.ceil((new Date().getMonth() + 1) / 3)} ${new Date().getFullYear()} Count`
+		`Q${Math.ceil((new Date().getMonth() + 1) / 3)} ${new Date().getFullYear()} Count`,
 	);
-	const [countType, setCountType] = useState<"quarterly" | "daily" | "spot">("quarterly");
+	const [countType, setCountType] = useState<"quarterly" | "daily" | "spot">(
+		"quarterly",
+	);
 	const [isStarted, setIsStarted] = useState(false);
-	const [countedItems, setCountedItems] = useState<Map<string, CountedItem>>(new Map());
+	const [countedItems, setCountedItems] = useState<Map<string, CountedItem>>(
+		new Map(),
+	);
 
 	const [currentItemIndex, setCurrentItemIndex] = useState(0);
-	const [categoryFilter, setCategoryFilter] = useState<ItemCategory | "all">("all");
+	const [categoryFilter, setCategoryFilter] = useState<ItemCategory | "all">(
+		"all",
+	);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [countInput, setCountInput] = useState<number | "">("");
 	const [showSummary, setShowSummary] = useState(false);
@@ -71,7 +77,7 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 			result = result.filter(
 				(item) =>
 					item.name.toLowerCase().includes(query) ||
-					item.location.toLowerCase().includes(query)
+					item.location.toLowerCase().includes(query),
 			);
 		}
 		return result;
@@ -83,7 +89,7 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 		const counted = countedItems.size;
 		const total = filteredItems.length;
 		const discrepancies = Array.from(countedItems.values()).filter(
-			(c) => c.discrepancy !== 0
+			(c) => c.discrepancy !== 0,
 		).length;
 		const surplus = Array.from(countedItems.values())
 			.filter((c) => c.discrepancy > 0)
@@ -154,7 +160,7 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 				itemId,
 				counted.countedQty,
 				countType,
-				`${sessionName} - Batch count`
+				`${sessionName} - Batch count`,
 			);
 		}
 		handleClose();
@@ -260,7 +266,9 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 								<Select
 									value={countType}
 									onChange={(e) =>
-										setCountType(e.target.value as "quarterly" | "daily" | "spot")
+										setCountType(
+											e.target.value as "quarterly" | "daily" | "spot",
+										)
 									}
 									selectSize="lg"
 								>
@@ -281,9 +289,13 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 									}
 									selectSize="lg"
 								>
-									<option value="all">All Categories ({items.length} items)</option>
+									<option value="all">
+										All Categories ({items.length} items)
+									</option>
 									{CATEGORIES.map((cat) => {
-										const count = items.filter((i) => i.category === cat).length;
+										const count = items.filter(
+											(i) => i.category === cat,
+										).length;
 										return (
 											<option key={cat} value={cat}>
 												{cat} ({count} items)
@@ -322,7 +334,9 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 									<p className="text-sm text-slate-400">Discrepancies</p>
 									<p
 										className={`text-2xl font-mono font-bold ${
-											stats.discrepancies > 0 ? "text-amber-400" : "text-emerald-400"
+											stats.discrepancies > 0
+												? "text-amber-400"
+												: "text-emerald-400"
 										}`}
 									>
 										{stats.discrepancies}
@@ -530,7 +544,9 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 										type="number"
 										value={countInput}
 										onChange={(e) =>
-											setCountInput(e.target.value === "" ? "" : Number(e.target.value))
+											setCountInput(
+												e.target.value === "" ? "" : Number(e.target.value),
+											)
 										}
 										min={0}
 										placeholder="Enter count"
@@ -569,7 +585,11 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 									)}
 
 									<div className="flex gap-3">
-										<Button variant="secondary" onClick={handleSkip} className="flex-1">
+										<Button
+											variant="secondary"
+											onClick={handleSkip}
+											className="flex-1"
+										>
 											Skip
 										</Button>
 										<Button
@@ -588,9 +608,14 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 							<div className="flex items-center justify-between text-sm text-slate-500">
 								<button
 									onClick={() => {
-										const prev = currentItemIndex > 0 ? currentItemIndex - 1 : filteredItems.length - 1;
+										const prev =
+											currentItemIndex > 0
+												? currentItemIndex - 1
+												: filteredItems.length - 1;
 										setCurrentItemIndex(prev);
-										setCountInput(getItemCount(filteredItems[prev]?.id)?.countedQty ?? "");
+										setCountInput(
+											getItemCount(filteredItems[prev]?.id)?.countedQty ?? "",
+										);
 									}}
 									className="p-2 hover:text-slate-300"
 								>
@@ -603,7 +628,9 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 									onClick={() => {
 										const next = (currentItemIndex + 1) % filteredItems.length;
 										setCurrentItemIndex(next);
-										setCountInput(getItemCount(filteredItems[next]?.id)?.countedQty ?? "");
+										setCountInput(
+											getItemCount(filteredItems[next]?.id)?.countedQty ?? "",
+										);
 									}}
 									className="p-2 hover:text-slate-300"
 								>

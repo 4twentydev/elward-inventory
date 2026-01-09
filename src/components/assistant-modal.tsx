@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Modal } from "./ui/modal";
+import { Loader2, MessageSquare, Send, Sparkles, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useInventory } from "./inventory-context";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { useInventory } from "./inventory-context";
-import { MessageSquare, Send, Loader2, Sparkles, Trash2 } from "lucide-react";
+import { Modal } from "./ui/modal";
 
 interface Message {
 	role: "user" | "assistant";
@@ -75,7 +75,8 @@ export function AssistantModal({ isOpen, onClose }: AssistantModalProps) {
 
 			setMessages((prev) => [...prev, assistantMessage]);
 		} catch (err) {
-			const errorMessage = err instanceof Error ? err.message : "Failed to get response";
+			const errorMessage =
+				err instanceof Error ? err.message : "Failed to get response";
 			setError(errorMessage);
 			setMessages((prev) => [
 				...prev,
@@ -119,8 +120,8 @@ export function AssistantModal({ isOpen, onClose }: AssistantModalProps) {
 								Ask me anything about your inventory
 							</h3>
 							<p className="text-sm text-slate-500 mb-6">
-								I can help you analyze {items.length} items, find trends, check stock
-								levels, and more.
+								I can help you analyze {items.length} items, find trends, check
+								stock levels, and more.
 							</p>
 							<div className="space-y-2">
 								<p className="text-xs text-slate-600 mb-2">Try asking:</p>
@@ -155,7 +156,9 @@ export function AssistantModal({ isOpen, onClose }: AssistantModalProps) {
 											{msg.role === "assistant" && (
 												<Sparkles className="w-4 h-4 text-blue-400 shrink-0 mt-1" />
 											)}
-											<p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+											<p className="text-sm whitespace-pre-wrap">
+												{msg.content}
+											</p>
 										</div>
 									</div>
 								</div>

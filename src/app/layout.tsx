@@ -4,7 +4,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
 	title: "Elward Inventory",
-	description: "Inventory management system for construction materials and tools",
+	description:
+		"Inventory management system for construction materials and tools",
 	manifest: "/manifest.json",
 	appleWebApp: {
 		capable: true,

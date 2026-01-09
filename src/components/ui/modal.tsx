@@ -1,8 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 interface ModalProps {
 	isOpen: boolean;
@@ -12,7 +12,13 @@ interface ModalProps {
 	size?: "sm" | "md" | "lg" | "xl";
 }
 
-export function Modal({ isOpen, onClose, title, children, size = "md" }: ModalProps) {
+export function Modal({
+	isOpen,
+	onClose,
+	title,
+	children,
+	size = "md",
+}: ModalProps) {
 	useEffect(() => {
 		if (isOpen) {
 			document.body.style.overflow = "hidden";
@@ -50,7 +56,7 @@ export function Modal({ isOpen, onClose, title, children, size = "md" }: ModalPr
 						"max-w-lg": size === "md",
 						"max-w-2xl": size === "lg",
 						"max-w-4xl": size === "xl",
-					}
+					},
 				)}
 			>
 				{title && (

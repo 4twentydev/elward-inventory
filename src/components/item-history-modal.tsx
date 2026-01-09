@@ -1,16 +1,16 @@
 "use client";
 
-import { Modal } from "./ui/modal";
-import { Badge } from "./ui/badge";
-import { useInventory } from "./inventory-context";
-import { formatDateTime } from "@/lib/utils";
 import {
 	ArrowDownToLine,
 	ArrowUpFromLine,
 	ClipboardCheck,
 	Settings,
 } from "lucide-react";
+import { formatDateTime } from "@/lib/utils";
 import type { InventoryItem, Transaction } from "@/types";
+import { useInventory } from "./inventory-context";
+import { Badge } from "./ui/badge";
+import { Modal } from "./ui/modal";
 
 interface ItemHistoryModalProps {
 	isOpen: boolean;
@@ -44,7 +44,11 @@ function TransactionBadge({ type }: { type: Transaction["type"] }) {
 	}
 }
 
-export function ItemHistoryModal({ isOpen, onClose, item }: ItemHistoryModalProps) {
+export function ItemHistoryModal({
+	isOpen,
+	onClose,
+	item,
+}: ItemHistoryModalProps) {
 	const { getItemTransactions } = useInventory();
 
 	if (!item) return null;
@@ -52,7 +56,12 @@ export function ItemHistoryModal({ isOpen, onClose, item }: ItemHistoryModalProp
 	const transactions = getItemTransactions(item.id);
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} title={`History: ${item.name}`} size="lg">
+		<Modal
+			isOpen={isOpen}
+			onClose={onClose}
+			title={`History: ${item.name}`}
+			size="lg"
+		>
 			<div className="space-y-4">
 				<div className="grid grid-cols-2 gap-4 text-sm">
 					<div className="p-3 bg-slate-800/50 rounded-lg">
@@ -64,7 +73,9 @@ export function ItemHistoryModal({ isOpen, onClose, item }: ItemHistoryModalProp
 					<div className="p-3 bg-slate-800/50 rounded-lg">
 						<p className="text-slate-400">Last Count</p>
 						<p className="text-slate-100">
-							{item.lastCountDate ? formatDateTime(item.lastCountDate) : "Never"}
+							{item.lastCountDate
+								? formatDateTime(item.lastCountDate)
+								: "Never"}
 						</p>
 						{item.lastCountBy && (
 							<p className="text-slate-500 text-xs">by {item.lastCountBy}</p>
@@ -95,7 +106,11 @@ export function ItemHistoryModal({ isOpen, onClose, item }: ItemHistoryModalProp
 										<div className="flex items-center gap-2 flex-wrap">
 											<TransactionBadge type={tx.type} />
 											<span className="font-mono text-sm">
-												{tx.type === "pull" ? "-" : tx.type === "return" ? "+" : ""}
+												{tx.type === "pull"
+													? "-"
+													: tx.type === "return"
+														? "+"
+														: ""}
 												{tx.quantity}
 											</span>
 											<span className="text-slate-500 text-sm">
@@ -106,7 +121,9 @@ export function ItemHistoryModal({ isOpen, onClose, item }: ItemHistoryModalProp
 											{tx.userName} • {formatDateTime(tx.createdAt)}
 										</p>
 										{tx.jobReference && (
-											<p className="text-sm text-slate-500">Job: {tx.jobReference}</p>
+											<p className="text-sm text-slate-500">
+												Job: {tx.jobReference}
+											</p>
 										)}
 										{tx.notes && (
 											<p className="text-sm text-slate-500 mt-1">{tx.notes}</p>

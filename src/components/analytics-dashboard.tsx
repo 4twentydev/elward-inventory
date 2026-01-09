@@ -1,28 +1,28 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useInventory } from "./inventory-context";
-import { Button } from "./ui/button";
-import { Card, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Select } from "./ui/select";
-import { Modal } from "./ui/modal";
 import {
+	Activity,
+	AlertTriangle,
+	ArrowLeft,
+	BarChart3,
+	Calendar,
+	DollarSign,
+	Download,
 	Package,
+	PieChart,
 	TrendingDown,
 	TrendingUp,
-	AlertTriangle,
-	DollarSign,
-	Activity,
-	Calendar,
-	ArrowLeft,
-	Download,
-	BarChart3,
-	PieChart,
 } from "lucide-react";
+import { useMemo, useState } from "react";
 import * as store from "@/lib/store";
 import { formatDate, formatDateTime } from "@/lib/utils";
 import type { ItemCategory, Transaction } from "@/types";
+import { useInventory } from "./inventory-context";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Card, CardHeader, CardTitle } from "./ui/card";
+import { Modal } from "./ui/modal";
+import { Select } from "./ui/select";
 
 interface AnalyticsDashboardProps {
 	isOpen: boolean;
@@ -39,13 +39,29 @@ const CATEGORY_COLORS: Record<ItemCategory, string> = {
 	Other: "bg-slate-600",
 };
 
-export function AnalyticsDashboard({ isOpen, onClose }: AnalyticsDashboardProps) {
-	const { items, getLowStockItems } = useInventory();
-	const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "all">("30d");
+export function AnalyticsDashboard({
+	isOpen,
+	onClose,
+}: AnalyticsDashboardProps) {
+	const { items, getLowStockItems, currentUser } = useInventory();
+	const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d" | "all">(
+		"30d",
+	);
+	const [viewMode, setViewMode] = useState<"all" | "my">("my");
 
-	const transactions = store.getTransactions();
-	const counts = store.getCounts();
+	const allTransactions = store.getTransactions();
+	const allCounts = store.getCounts();
 	const lowStockItems = getLowStockItems();
+
+	// Filter by user if in "my" mode
+	const transactions =
+		viewMode === "my" && currentUser
+			? allTransactions.filter((t) => t.userId === currentUser.id)
+			: allTransactions;
+	const counts =
+		viewMode === "my" && currentUser
+			? allCounts.filter((c) => c.userId === currentUser.id)
+			: allCounts;
 
 	// Calculate date filter
 	const dateFilter = useMemo(() => {
@@ -77,7 +93,10 @@ export function AnalyticsDashboard({ isOpen, onClose }: AnalyticsDashboardProps)
 		}, 0);
 
 		// Category breakdown
-		const categoryBreakdown: Record<string, { count: number; quantity: number }> = {};
+		const categoryBreakdown: Record<
+			string,
+			{ count: number; quantity: number }
+		> = {};
 		for (const item of items) {
 			if (!categoryBreakdown[item.category]) {
 				categoryBreakdown[item.category] = { count: 0, quantity: 0 };
@@ -160,20 +179,36 @@ export function AnalyticsDashboard({ isOpen, onClose }: AnalyticsDashboardProps)
 							<ArrowLeft className="w-5 h-5" />
 						</button>
 						<div>
-							<h1 className="font-semibold text-slate-100">Analytics Dashboard</h1>
-							<p className="text-xs text-slate-500">Inventory insights and reports</p>
+							<h1 className="font-semibold text-slate-100">
+								Analytics Dashboard
+							</h1>
+							<p className="text-xs text-slate-500">
+								{viewMode === "my"
+									? `My Activity - ${currentUser?.name}`
+									: "All Activity"}
+							</p>
 						</div>
 					</div>
-					<Select
-						value={dateRange}
-						onChange={(e) => setDateRange(e.target.value as typeof dateRange)}
-						className="w-32"
-					>
-						<option value="7d">Last 7 days</option>
-						<option value="30d">Last 30 days</option>
-						<option value="90d">Last 90 days</option>
-						<option value="all">All time</option>
-					</Select>
+					<div className="flex items-center gap-3">
+						<Select
+							value={viewMode}
+							onChange={(e) => setViewMode(e.target.value as typeof viewMode)}
+							className="w-36"
+						>
+							<option value="my">My Activity</option>
+							<option value="all">All Activity</option>
+						</Select>
+						<Select
+							value={dateRange}
+							onChange={(e) => setDateRange(e.target.value as typeof dateRange)}
+							className="w-32"
+						>
+							<option value="7d">Last 7 days</option>
+							<option value="30d">Last 30 days</option>
+							<option value="90d">Last 90 days</option>
+							<option value="all">All time</option>
+						</Select>
+					</div>
 				</div>
 			</header>
 
@@ -218,7 +253,10 @@ export function AnalyticsDashboard({ isOpen, onClose }: AnalyticsDashboardProps)
 								<div>
 									<p className="text-sm text-slate-400">Est. Value</p>
 									<p className="text-2xl font-bold text-slate-100">
-										${stats.totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+										$
+										{stats.totalValue.toLocaleString(undefined, {
+											maximumFractionDigits: 0,
+										})}
 									</p>
 								</div>
 							</div>
@@ -348,7 +386,9 @@ export function AnalyticsDashboard({ isOpen, onClose }: AnalyticsDashboardProps)
 											</span>
 											<div className="flex-1 min-w-0">
 												<p className="text-slate-200 truncate">{item!.name}</p>
-												<p className="text-xs text-slate-500">{item!.category}</p>
+												<p className="text-xs text-slate-500">
+													{item!.category}
+												</p>
 											</div>
 											<span className="text-slate-400 font-mono">
 												{item!.quantity}
@@ -395,7 +435,9 @@ export function AnalyticsDashboard({ isOpen, onClose }: AnalyticsDashboardProps)
 									<div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-2">
 										<Package className="w-6 h-6 text-emerald-400" />
 									</div>
-									<p className="text-emerald-400">All items above reorder level</p>
+									<p className="text-emerald-400">
+										All items above reorder level
+									</p>
 								</div>
 							)}
 						</Card>
@@ -413,7 +455,7 @@ export function AnalyticsDashboard({ isOpen, onClose }: AnalyticsDashboardProps)
 							<div className="space-y-3">
 								{recentCounts.map(([date, dayCounts]) => {
 									const discrepancies = dayCounts.filter(
-										(c) => c.discrepancy !== 0
+										(c) => c.discrepancy !== 0,
 									).length;
 									return (
 										<div
@@ -490,7 +532,11 @@ export function AnalyticsDashboard({ isOpen, onClose }: AnalyticsDashboardProps)
 															: "text-slate-400"
 												}`}
 											>
-												{tx.type === "pull" ? "-" : tx.type === "return" ? "+" : ""}
+												{tx.type === "pull"
+													? "-"
+													: tx.type === "return"
+														? "+"
+														: ""}
 												{tx.quantity}
 											</span>
 										</div>

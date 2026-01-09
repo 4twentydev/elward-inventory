@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Modal } from "./ui/modal";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { useInventory } from "./inventory-context";
+import { Check, Loader2, Printer, QrCode } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
-	generateItemLabel,
 	generateBulkLabels,
+	generateItemLabel,
 	generatePrintPageHTML,
 	type LabelData,
 } from "@/lib/labels";
-import { Printer, QrCode, Check, Loader2 } from "lucide-react";
 import type { InventoryItem } from "@/types";
+import { useInventory } from "./inventory-context";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Modal } from "./ui/modal";
 
 interface LabelModalProps {
 	isOpen: boolean;
@@ -106,12 +106,20 @@ export function LabelModal({ isOpen, onClose, item }: LabelModalProps) {
 							<div className="border border-slate-700 rounded-lg p-4 bg-white">
 								<div className="flex gap-4">
 									<div className="flex-1 min-w-0">
-										<p className="font-bold text-slate-900 truncate">{label.name}</p>
+										<p className="font-bold text-slate-900 truncate">
+											{label.name}
+										</p>
 										{label.sku && (
-											<p className="text-xs text-slate-600 font-mono">{label.sku}</p>
+											<p className="text-xs text-slate-600 font-mono">
+												{label.sku}
+											</p>
 										)}
-										<p className="text-xs text-slate-500 mt-1">{label.location}</p>
-										<p className="text-xs text-slate-400 mt-1">{label.category}</p>
+										<p className="text-xs text-slate-500 mt-1">
+											{label.location}
+										</p>
+										<p className="text-xs text-slate-400 mt-1">
+											{label.category}
+										</p>
 									</div>
 									{label.qrDataUrl && (
 										<img
@@ -128,7 +136,11 @@ export function LabelModal({ isOpen, onClose, item }: LabelModalProps) {
 							</p>
 
 							<div className="flex gap-3">
-								<Button variant="secondary" onClick={onClose} className="flex-1">
+								<Button
+									variant="secondary"
+									onClick={onClose}
+									className="flex-1"
+								>
 									Cancel
 								</Button>
 								<Button onClick={handlePrintSingle} className="flex-1">
@@ -146,7 +158,9 @@ export function LabelModal({ isOpen, onClose, item }: LabelModalProps) {
 							{selectedIds.size} of {items.length} items selected
 						</p>
 						<Button variant="ghost" size="sm" onClick={handleSelectAll}>
-							{selectedIds.size === items.length ? "Deselect All" : "Select All"}
+							{selectedIds.size === items.length
+								? "Deselect All"
+								: "Select All"}
 						</Button>
 					</div>
 

@@ -1,11 +1,11 @@
 import {
+	boolean,
+	decimal,
+	integer,
+	pgEnum,
 	pgTable,
 	text,
-	integer,
 	timestamp,
-	decimal,
-	boolean,
-	pgEnum,
 } from "drizzle-orm/pg-core";
 
 export const categoryEnum = pgEnum("category", [
@@ -25,9 +25,14 @@ export const transactionTypeEnum = pgEnum("transaction_type", [
 	"return",
 	"adjustment",
 	"count",
+	"transfer",
 ]);
 
-export const countTypeEnum = pgEnum("count_type", ["quarterly", "daily", "spot"]);
+export const countTypeEnum = pgEnum("count_type", [
+	"quarterly",
+	"daily",
+	"spot",
+]);
 
 export const users = pgTable("users", {
 	id: text("id").primaryKey(),
@@ -70,6 +75,8 @@ export const transactions = pgTable("transactions", {
 	userName: text("user_name").notNull(),
 	jobReference: text("job_reference"),
 	notes: text("notes"),
+	fromLocation: text("from_location"),
+	toLocation: text("to_location"),
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -122,6 +129,17 @@ export const aiCountLogs = pgTable("ai_count_logs", {
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const chatMessages = pgTable("chat_messages", {
+	id: text("id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => users.id, { onDelete: "cascade" }),
+	userName: text("user_name").notNull(),
+	role: text("role").notNull(),
+	content: text("content").notNull(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -135,3 +153,5 @@ export type CountSession = typeof countSessions.$inferSelect;
 export type NewCountSession = typeof countSessions.$inferInsert;
 export type AICountLog = typeof aiCountLogs.$inferSelect;
 export type NewAICountLog = typeof aiCountLogs.$inferInsert;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type NewChatMessage = typeof chatMessages.$inferInsert;

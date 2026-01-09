@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Modal } from "./ui/modal";
+import { useEffect, useState } from "react";
+import type { InventoryItem, ItemCategory } from "@/types";
+import { useInventory } from "./inventory-context";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Modal } from "./ui/modal";
 import { Select } from "./ui/select";
 import { useInventory } from "./inventory-context";
 import type { InventoryItem, ItemCategory } from "@/types";
@@ -109,7 +111,9 @@ export function ItemFormModal({ isOpen, onClose, item }: ItemFormModalProps) {
 						</label>
 						<Input
 							value={formData.name}
-							onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+							onChange={(e) =>
+								setFormData({ ...formData, name: e.target.value })
+							}
 							placeholder="Enter item name"
 							required
 							inputSize="lg"
@@ -123,7 +127,10 @@ export function ItemFormModal({ isOpen, onClose, item }: ItemFormModalProps) {
 						<Select
 							value={formData.category}
 							onChange={(e) =>
-								setFormData({ ...formData, category: e.target.value as ItemCategory })
+								setFormData({
+									...formData,
+									category: e.target.value as ItemCategory,
+								})
 							}
 							selectSize="lg"
 						>
@@ -168,7 +175,9 @@ export function ItemFormModal({ isOpen, onClose, item }: ItemFormModalProps) {
 						</label>
 						<Input
 							value={formData.supplier}
-							onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
+							onChange={(e) =>
+								setFormData({ ...formData, supplier: e.target.value })
+							}
 							placeholder="Supplier name"
 							inputSize="lg"
 						/>
@@ -182,7 +191,10 @@ export function ItemFormModal({ isOpen, onClose, item }: ItemFormModalProps) {
 							type="number"
 							value={formData.reorderLevel}
 							onChange={(e) =>
-								setFormData({ ...formData, reorderLevel: Number(e.target.value) })
+								setFormData({
+									...formData,
+									reorderLevel: Number(e.target.value),
+								})
 							}
 							min={0}
 							inputSize="lg"
@@ -195,7 +207,9 @@ export function ItemFormModal({ isOpen, onClose, item }: ItemFormModalProps) {
 						</label>
 						<Input
 							value={formData.sku}
-							onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+							onChange={(e) =>
+								setFormData({ ...formData, sku: e.target.value })
+							}
 							placeholder="Optional"
 							inputSize="lg"
 						/>
@@ -223,7 +237,9 @@ export function ItemFormModal({ isOpen, onClose, item }: ItemFormModalProps) {
 						</label>
 						<textarea
 							value={formData.notes}
-							onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+							onChange={(e) =>
+								setFormData({ ...formData, notes: e.target.value })
+							}
 							placeholder="Additional notes..."
 							rows={3}
 							className="input resize-none"
@@ -232,7 +248,12 @@ export function ItemFormModal({ isOpen, onClose, item }: ItemFormModalProps) {
 				</div>
 
 				<div className="flex gap-3 pt-4">
-					<Button type="button" variant="secondary" onClick={onClose} className="flex-1">
+					<Button
+						type="button"
+						variant="secondary"
+						onClick={onClose}
+						className="flex-1"
+					>
 						Cancel
 					</Button>
 					<Button type="submit" className="flex-1">

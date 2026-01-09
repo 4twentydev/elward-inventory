@@ -27,7 +27,7 @@ export interface InventoryItem {
 export interface Transaction {
 	id: string;
 	itemId: string;
-	type: "pull" | "return" | "adjustment" | "count";
+	type: "pull" | "return" | "adjustment" | "count" | "transfer";
 	quantity: number;
 	previousQuantity: number;
 	newQuantity: number;
@@ -35,6 +35,8 @@ export interface Transaction {
 	userName: string;
 	jobReference?: string;
 	notes?: string;
+	fromLocation?: string;
+	toLocation?: string;
 	createdAt: string;
 }
 
@@ -69,6 +71,15 @@ export interface AICountLog {
 	userId: string;
 	userName: string;
 	profileName?: string;
+	createdAt: string;
+}
+
+export interface ChatMessage {
+	id: string;
+	userId: string;
+	userName: string;
+	role: "user" | "assistant";
+	content: string;
 	createdAt: string;
 }
 

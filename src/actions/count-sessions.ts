@@ -1,12 +1,12 @@
 "use server";
 
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { db, isDbConfigured } from "@/db";
-import { countSessions, counts, items } from "@/db/schema";
-import { eq, desc, and, isNull } from "drizzle-orm";
 import type { CountSession, NewCountSession } from "@/db/schema";
+import { countSessions, counts, items } from "@/db/schema";
 
 export async function createCountSession(
-	session: NewCountSession
+	session: NewCountSession,
 ): Promise<CountSession> {
 	if (!isDbConfigured() || !db) throw new Error("Database not configured");
 
@@ -21,7 +21,9 @@ export async function createCountSession(
 	return result[0];
 }
 
-export async function getCountSession(id: string): Promise<CountSession | null> {
+export async function getCountSession(
+	id: string,
+): Promise<CountSession | null> {
 	if (!isDbConfigured() || !db) return null;
 	const result = await db
 		.select()
@@ -41,7 +43,7 @@ export async function getActiveCountSessions(): Promise<CountSession[]> {
 }
 
 export async function getCompletedCountSessions(
-	limit = 10
+	limit = 10,
 ): Promise<CountSession[]> {
 	if (!isDbConfigured() || !db) return [];
 	return db
@@ -54,7 +56,7 @@ export async function getCompletedCountSessions(
 
 export async function updateCountSession(
 	id: string,
-	updates: Partial<CountSession>
+	updates: Partial<CountSession>,
 ): Promise<CountSession | null> {
 	if (!isDbConfigured() || !db) throw new Error("Database not configured");
 	const result = await db
@@ -66,7 +68,7 @@ export async function updateCountSession(
 }
 
 export async function completeCountSession(
-	id: string
+	id: string,
 ): Promise<CountSession | null> {
 	if (!isDbConfigured() || !db) throw new Error("Database not configured");
 
@@ -77,7 +79,9 @@ export async function completeCountSession(
 		.where(eq(counts.countSessionId, id));
 
 	const countedItems = sessionCounts.length;
-	const discrepancyCount = sessionCounts.filter((c) => c.discrepancy !== 0).length;
+	const discrepancyCount = sessionCounts.filter(
+		(c) => c.discrepancy !== 0,
+	).length;
 
 	const result = await db
 		.update(countSessions)
@@ -114,7 +118,13 @@ export async function getSessionSummary(sessionId: string) {
 			session: null,
 			counts: [],
 			uncountedItems: [],
-			stats: { total: 0, counted: 0, discrepancies: 0, surplus: 0, shortage: 0 },
+			stats: {
+				total: 0,
+				counted: 0,
+				discrepancies: 0,
+				surplus: 0,
+				shortage: 0,
+			},
 		};
 
 	const session = await getCountSession(sessionId);

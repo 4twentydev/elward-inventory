@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Modal } from "./ui/modal";
+import { Eye, Plus, Shield, Trash2, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import * as store from "@/lib/store";
+import type { User as UserType } from "@/types";
+import { useInventory } from "./inventory-context";
+import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Modal } from "./ui/modal";
 import { Select } from "./ui/select";
-import { Badge } from "./ui/badge";
-import { useInventory } from "./inventory-context";
-import * as store from "@/lib/store";
-import { Plus, Trash2, User, Shield, Eye } from "lucide-react";
-import type { User as UserType } from "@/types";
 
 interface UserManagementProps {
 	isOpen: boolean;
@@ -53,9 +53,12 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
 	const handleToggleActive = (userId: string) => {
 		const allUsers = store.getUsers();
 		const updatedUsers = allUsers.map((u) =>
-			u.id === userId ? { ...u, active: !u.active } : u
+			u.id === userId ? { ...u, active: !u.active } : u,
 		);
-		localStorage.setItem("elward_inventory_users", JSON.stringify(updatedUsers));
+		localStorage.setItem(
+			"elward_inventory_users",
+			JSON.stringify(updatedUsers),
+		);
 		setUsers(updatedUsers);
 	};
 
@@ -72,7 +75,12 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
 
 	if (currentUser?.role !== "admin") {
 		return (
-			<Modal isOpen={isOpen} onClose={onClose} title="User Management" size="md">
+			<Modal
+				isOpen={isOpen}
+				onClose={onClose}
+				title="User Management"
+				size="md"
+			>
 				<div className="text-center py-8">
 					<Shield className="w-12 h-12 text-slate-600 mx-auto mb-4" />
 					<p className="text-slate-400">Admin access required</p>
@@ -90,10 +98,14 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
 						<h3 className="font-medium text-slate-200">Add New User</h3>
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 							<div>
-								<label className="block text-sm text-slate-400 mb-1">Name</label>
+								<label className="block text-sm text-slate-400 mb-1">
+									Name
+								</label>
 								<Input
 									value={newUser.name}
-									onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+									onChange={(e) =>
+										setNewUser({ ...newUser, name: e.target.value })
+									}
 									placeholder="User name"
 								/>
 							</div>
@@ -101,13 +113,17 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
 								<label className="block text-sm text-slate-400 mb-1">PIN</label>
 								<Input
 									value={newUser.pin}
-									onChange={(e) => setNewUser({ ...newUser, pin: e.target.value })}
+									onChange={(e) =>
+										setNewUser({ ...newUser, pin: e.target.value })
+									}
 									placeholder="4-6 digits"
 									maxLength={6}
 								/>
 							</div>
 							<div>
-								<label className="block text-sm text-slate-400 mb-1">Role</label>
+								<label className="block text-sm text-slate-400 mb-1">
+									Role
+								</label>
 								<Select
 									value={newUser.role}
 									onChange={(e) =>

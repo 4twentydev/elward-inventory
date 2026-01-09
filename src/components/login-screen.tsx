@@ -1,10 +1,10 @@
 "use client";
 
+import { AlertCircle, Package } from "lucide-react";
 import { useState } from "react";
 import { useInventory } from "./inventory-context";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Package, AlertCircle } from "lucide-react";
 
 export function LoginScreen() {
 	const { login } = useInventory();
@@ -39,7 +39,9 @@ export function LoginScreen() {
 					<div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/20 mb-4">
 						<Package className="w-8 h-8 text-amber-500" />
 					</div>
-					<h1 className="text-2xl font-bold text-slate-100">Elward Inventory</h1>
+					<h1 className="text-2xl font-bold text-slate-100">
+						Elward Inventory
+					</h1>
 					<p className="text-slate-400 mt-1">Enter your PIN to continue</p>
 				</div>
 
@@ -79,7 +81,7 @@ export function LoginScreen() {
 										</button>
 									) : (
 										<div key={`empty-${i}`} />
-									)
+									),
 							)}
 						</div>
 
@@ -92,7 +94,11 @@ export function LoginScreen() {
 							>
 								Clear
 							</Button>
-							<Button type="submit" className="flex-1" disabled={pin.length < 4}>
+							<Button
+								type="submit"
+								className="flex-1"
+								disabled={pin.length < 4}
+							>
 								Login
 							</Button>
 						</div>
