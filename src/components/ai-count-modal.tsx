@@ -1,13 +1,20 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Modal } from "./ui/modal";
+import {
+	AlertCircle,
+	Camera,
+	Check,
+	Loader2,
+	Sparkles,
+	Upload,
+} from "lucide-react";
+import { useRef, useState } from "react";
+import * as store from "@/lib/store";
+import { useInventory } from "./inventory-context";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Modal } from "./ui/modal";
 import { Select } from "./ui/select";
-import { useInventory } from "./inventory-context";
-import { Camera, Upload, Sparkles, AlertCircle, Check, Loader2 } from "lucide-react";
-import * as store from "@/lib/store";
 
 interface AICountModalProps {
 	isOpen: boolean;
@@ -91,7 +98,7 @@ export function AICountModal({ isOpen, onClose }: AICountModalProps) {
 			selectedItemId,
 			confirmedCount,
 			"spot",
-			`AI-assisted count. AI suggested: ${aiCount}`
+			`AI-assisted count. AI suggested: ${aiCount}`,
 		);
 
 		handleClose();
@@ -107,7 +114,12 @@ export function AICountModal({ isOpen, onClose }: AICountModalProps) {
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={handleClose} title="AI Bundle Counter" size="lg">
+		<Modal
+			isOpen={isOpen}
+			onClose={handleClose}
+			title="AI Bundle Counter"
+			size="lg"
+		>
 			<div className="space-y-5">
 				<p className="text-slate-400 text-sm">
 					Upload a photo of extrusion bundle ends and let AI count them for you.
@@ -131,7 +143,9 @@ export function AICountModal({ isOpen, onClose }: AICountModalProps) {
 							<div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-slate-800 mb-4">
 								<Camera className="w-7 h-7 text-slate-400" />
 							</div>
-							<p className="text-slate-300 mb-2">Take a photo or upload an image</p>
+							<p className="text-slate-300 mb-2">
+								Take a photo or upload an image
+							</p>
 							<p className="text-sm text-slate-500">
 								Best results with clear, well-lit photos of bundle ends
 							</p>
@@ -227,7 +241,7 @@ export function AICountModal({ isOpen, onClose }: AICountModalProps) {
 										value={confirmedCount}
 										onChange={(e) =>
 											setConfirmedCount(
-												e.target.value === "" ? "" : Number(e.target.value)
+												e.target.value === "" ? "" : Number(e.target.value),
 											)
 										}
 										min={0}
@@ -255,7 +269,11 @@ export function AICountModal({ isOpen, onClose }: AICountModalProps) {
 								</div>
 
 								<div className="flex gap-3 pt-2">
-									<Button variant="secondary" onClick={handleClose} className="flex-1">
+									<Button
+										variant="secondary"
+										onClick={handleClose}
+										className="flex-1"
+									>
 										Cancel
 									</Button>
 									<Button
@@ -273,7 +291,9 @@ export function AICountModal({ isOpen, onClose }: AICountModalProps) {
 				)}
 
 				<div className="border-t border-slate-800 pt-4">
-					<h4 className="text-sm font-medium text-slate-300 mb-2">Tips for best results</h4>
+					<h4 className="text-sm font-medium text-slate-300 mb-2">
+						Tips for best results
+					</h4>
 					<ul className="text-sm text-slate-500 space-y-1">
 						<li>• Position camera directly above the bundle ends</li>
 						<li>• Ensure good, even lighting without harsh shadows</li>

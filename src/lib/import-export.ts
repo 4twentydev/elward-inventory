@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import type { InventoryItem, ItemCategory, ImportResult } from "@/types";
+import type { ImportResult, InventoryItem, ItemCategory } from "@/types";
 import { generateId } from "./utils";
 
 const CATEGORY_MAP: Record<string, ItemCategory> = {
@@ -34,7 +34,9 @@ function parseNumber(value: any): number {
 }
 
 function findColumnIndex(headers: string[], possibleNames: string[]): number {
-	const lowerHeaders = headers.map((h) => h?.toString().toLowerCase().trim() || "");
+	const lowerHeaders = headers.map(
+		(h) => h?.toString().toLowerCase().trim() || "",
+	);
 	for (const name of possibleNames) {
 		const idx = lowerHeaders.indexOf(name.toLowerCase());
 		if (idx !== -1) return idx;
@@ -47,27 +49,97 @@ export function parseExcelFile(buffer: ArrayBuffer): ImportResult {
 		const workbook = XLSX.read(buffer, { type: "array" });
 		const sheetName = workbook.SheetNames[0];
 		const sheet = workbook.Sheets[sheetName];
-		const data = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, { header: 1 });
+		const data = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, {
+			header: 1,
+		});
 
 		if (data.length < 2) {
-			return { success: false, imported: 0, errors: ["File is empty or has no data rows"] };
+			return {
+				success: false,
+				imported: 0,
+				errors: ["File is empty or has no data rows"],
+			};
 		}
 
 		const headers = (data[0] as string[]).map((h) => h?.toString() || "");
 
 		// Find column indices
-		const nameIdx = findColumnIndex(headers, ["name", "item", "item name", "description", "product", "part_number", "part number", "job", "job_number", "tent", "pallet_number", "row"]);
+		const nameIdx = findColumnIndex(headers, [
+			"name",
+			"item",
+			"item name",
+			"description",
+			"product",
+			"part_number",
+			"part number",
+			"job",
+			"job_number",
+			"tent",
+			"pallet_number",
+			"row",
+		]);
 		const categoryIdx = findColumnIndex(headers, ["category", "type", "cat"]);
-		const quantityIdx = findColumnIndex(headers, ["quantity", "qty", "count", "stock", "on hand", "total", "each_quantity"]);
-		const locationIdx = findColumnIndex(headers, ["location", "loc", "bin", "warehouse", "tent"]);
-		const supplierIdx = findColumnIndex(headers, ["supplier", "vendor", "manufacturer"]);
-		const reorderIdx = findColumnIndex(headers, ["reorder", "reorder level", "min", "minimum"]);
-		const notesIdx = findColumnIndex(headers, ["notes", "note", "comments", "description", "color", "size", "thickness", "unit"]);
-		const skuIdx = findColumnIndex(headers, ["sku", "part number", "part_number", "part", "code", "item number", "pallet_number"]);
-		const costIdx = findColumnIndex(headers, ["cost", "price", "unit cost", "unit price"]);
+		const quantityIdx = findColumnIndex(headers, [
+			"quantity",
+			"qty",
+			"count",
+			"stock",
+			"on hand",
+			"total",
+			"each_quantity",
+		]);
+		const locationIdx = findColumnIndex(headers, [
+			"location",
+			"loc",
+			"bin",
+			"warehouse",
+			"tent",
+		]);
+		const supplierIdx = findColumnIndex(headers, [
+			"supplier",
+			"vendor",
+			"manufacturer",
+		]);
+		const reorderIdx = findColumnIndex(headers, [
+			"reorder",
+			"reorder level",
+			"min",
+			"minimum",
+		]);
+		const notesIdx = findColumnIndex(headers, [
+			"notes",
+			"note",
+			"comments",
+			"description",
+			"color",
+			"size",
+			"thickness",
+			"unit",
+		]);
+		const skuIdx = findColumnIndex(headers, [
+			"sku",
+			"part number",
+			"part_number",
+			"part",
+			"code",
+			"item number",
+			"pallet_number",
+		]);
+		const costIdx = findColumnIndex(headers, [
+			"cost",
+			"price",
+			"unit cost",
+			"unit price",
+		]);
 
 		if (nameIdx === -1) {
-			return { success: false, imported: 0, errors: ["Could not find a name column (name, part_number, job, job_number, tent, pallet_number, row, etc.)"] };
+			return {
+				success: false,
+				imported: 0,
+				errors: [
+					"Could not find a name column (name, part_number, job, job_number, tent, pallet_number, row, etc.)",
+				],
+			};
 		}
 
 		const items: InventoryItem[] = [];
@@ -85,10 +157,15 @@ export function parseExcelFile(buffer: ArrayBuffer): ImportResult {
 				const item: InventoryItem = {
 					id: generateId(),
 					name,
-					category: categoryIdx >= 0 ? normalizeCategory(row[categoryIdx]?.toString() || "") : "Other",
+					category:
+						categoryIdx >= 0
+							? normalizeCategory(row[categoryIdx]?.toString() || "")
+							: "Other",
 					quantity: quantityIdx >= 0 ? parseNumber(row[quantityIdx]) : 0,
-					location: locationIdx >= 0 ? row[locationIdx]?.toString().trim() || "" : "",
-					supplier: supplierIdx >= 0 ? row[supplierIdx]?.toString().trim() || "" : "",
+					location:
+						locationIdx >= 0 ? row[locationIdx]?.toString().trim() || "" : "",
+					supplier:
+						supplierIdx >= 0 ? row[supplierIdx]?.toString().trim() || "" : "",
 					reorderLevel: reorderIdx >= 0 ? parseNumber(row[reorderIdx]) : 0,
 					notes: notesIdx >= 0 ? row[notesIdx]?.toString().trim() || "" : "",
 					sku: skuIdx >= 0 ? row[skuIdx]?.toString().trim() : undefined,
@@ -98,7 +175,9 @@ export function parseExcelFile(buffer: ArrayBuffer): ImportResult {
 				};
 				items.push(item);
 			} catch (e) {
-				errors.push(`Row ${i + 1}: ${e instanceof Error ? e.message : "Unknown error"}`);
+				errors.push(
+					`Row ${i + 1}: ${e instanceof Error ? e.message : "Unknown error"}`,
+				);
 			}
 		}
 
@@ -121,7 +200,11 @@ export function parseCSVFile(content: string): ImportResult {
 	try {
 		const lines = content.split(/\r?\n/).filter((line) => line.trim());
 		if (lines.length < 2) {
-			return { success: false, imported: 0, errors: ["File is empty or has no data rows"] };
+			return {
+				success: false,
+				imported: 0,
+				errors: ["File is empty or has no data rows"],
+			};
 		}
 
 		// Simple CSV parsing (handles quoted values)
@@ -146,16 +229,54 @@ export function parseCSVFile(content: string): ImportResult {
 		};
 
 		const headers = parseCSVLine(lines[0]);
-		const nameIdx = findColumnIndex(headers, ["name", "profile", "item", "description", "part_number", "part number", "job", "job_number", "tent", "pallet_number", "row"]);
+		const nameIdx = findColumnIndex(headers, [
+			"name",
+			"profile",
+			"item",
+			"description",
+			"part_number",
+			"part number",
+			"job",
+			"job_number",
+			"tent",
+			"pallet_number",
+			"row",
+		]);
 		const categoryIdx = findColumnIndex(headers, ["category", "type"]);
-		const quantityIdx = findColumnIndex(headers, ["quantity", "qty", "count", "total", "each_quantity"]);
+		const quantityIdx = findColumnIndex(headers, [
+			"quantity",
+			"qty",
+			"count",
+			"total",
+			"each_quantity",
+		]);
 		const locationIdx = findColumnIndex(headers, ["location", "loc", "tent"]);
 		const supplierIdx = findColumnIndex(headers, ["supplier", "vendor"]);
-		const notesIdx = findColumnIndex(headers, ["notes", "note", "color", "size", "thickness", "unit"]);
-		const skuIdx = findColumnIndex(headers, ["sku", "part", "code", "part_number", "part number", "pallet_number"]);
+		const notesIdx = findColumnIndex(headers, [
+			"notes",
+			"note",
+			"color",
+			"size",
+			"thickness",
+			"unit",
+		]);
+		const skuIdx = findColumnIndex(headers, [
+			"sku",
+			"part",
+			"code",
+			"part_number",
+			"part number",
+			"pallet_number",
+		]);
 
 		if (nameIdx === -1) {
-			return { success: false, imported: 0, errors: ["Could not find a name column (name, part_number, job, job_number, tent, pallet_number, row, etc.)"] };
+			return {
+				success: false,
+				imported: 0,
+				errors: [
+					"Could not find a name column (name, part_number, job, job_number, tent, pallet_number, row, etc.)",
+				],
+			};
 		}
 
 		const items: InventoryItem[] = [];
@@ -171,7 +292,10 @@ export function parseCSVFile(content: string): ImportResult {
 				const item: InventoryItem = {
 					id: generateId(),
 					name,
-					category: categoryIdx >= 0 ? normalizeCategory(row[categoryIdx] || "") : "Extrusions",
+					category:
+						categoryIdx >= 0
+							? normalizeCategory(row[categoryIdx] || "")
+							: "Extrusions",
 					quantity: quantityIdx >= 0 ? parseNumber(row[quantityIdx]) : 0,
 					location: locationIdx >= 0 ? row[locationIdx]?.trim() || "" : "",
 					supplier: supplierIdx >= 0 ? row[supplierIdx]?.trim() || "" : "",
@@ -183,7 +307,9 @@ export function parseCSVFile(content: string): ImportResult {
 				};
 				items.push(item);
 			} catch (e) {
-				errors.push(`Row ${i + 1}: ${e instanceof Error ? e.message : "Unknown error"}`);
+				errors.push(
+					`Row ${i + 1}: ${e instanceof Error ? e.message : "Unknown error"}`,
+				);
 			}
 		}
 
@@ -203,7 +329,17 @@ export function parseCSVFile(content: string): ImportResult {
 }
 
 export function exportToCSV(items: InventoryItem[]): string {
-	const headers = ["Name", "Category", "Quantity", "Location", "Supplier", "Reorder Level", "Notes", "SKU", "Unit Cost"];
+	const headers = [
+		"Name",
+		"Category",
+		"Quantity",
+		"Location",
+		"Supplier",
+		"Reorder Level",
+		"Notes",
+		"SKU",
+		"Unit Cost",
+	];
 	const rows = items.map((item) => [
 		`"${item.name.replace(/"/g, '""')}"`,
 		item.category,

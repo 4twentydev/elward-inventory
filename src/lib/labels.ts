@@ -26,7 +26,9 @@ export async function generateQRCode(data: string): Promise<string> {
 	}
 }
 
-export async function generateItemLabel(item: InventoryItem): Promise<LabelData> {
+export async function generateItemLabel(
+	item: InventoryItem,
+): Promise<LabelData> {
 	const qrData = JSON.stringify({
 		id: item.id,
 		name: item.name,
@@ -46,7 +48,7 @@ export async function generateItemLabel(item: InventoryItem): Promise<LabelData>
 }
 
 export async function generateBulkLabels(
-	items: InventoryItem[]
+	items: InventoryItem[],
 ): Promise<LabelData[]> {
 	const labels = await Promise.all(items.map(generateItemLabel));
 	return labels;

@@ -1,9 +1,9 @@
 "use server";
 
+import { and, eq } from "drizzle-orm";
 import { db, isDbConfigured } from "@/db";
+import type { NewUser, User } from "@/db/schema";
 import { users } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
-import type { User, NewUser } from "@/db/schema";
 
 export async function getUsers(): Promise<User[]> {
 	if (!isDbConfigured() || !db) return [];
@@ -34,7 +34,7 @@ export async function createUser(user: NewUser): Promise<User> {
 
 export async function updateUser(
 	id: string,
-	updates: Partial<NewUser>
+	updates: Partial<NewUser>,
 ): Promise<User | null> {
 	if (!isDbConfigured() || !db) throw new Error("Database not configured");
 	const result = await db

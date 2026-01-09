@@ -1,8 +1,8 @@
 "use client";
 
 import { useInventory } from "./inventory-context";
-import { LoginScreen } from "./login-screen";
 import { InventoryList } from "./inventory-list";
+import { LoginScreen } from "./login-screen";
 
 export function App() {
 	const { currentUser, isLoading } = useInventory();

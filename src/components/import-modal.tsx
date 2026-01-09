@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Modal } from "./ui/modal";
-import { Button } from "./ui/button";
-import { useInventory } from "./inventory-context";
-import { parseExcelFile, parseCSVFile } from "@/lib/import-export";
-import { Upload, FileSpreadsheet, AlertCircle, CheckCircle } from "lucide-react";
+import {
+	AlertCircle,
+	CheckCircle,
+	FileSpreadsheet,
+	Upload,
+} from "lucide-react";
+import { useRef, useState } from "react";
+import { parseCSVFile, parseExcelFile } from "@/lib/import-export";
 import type { ImportResult, InventoryItem } from "@/types";
+import { useInventory } from "./inventory-context";
+import { Button } from "./ui/button";
+import { Modal } from "./ui/modal";
 
 interface ImportModalProps {
 	isOpen: boolean;
@@ -39,7 +44,9 @@ export function ImportModal({ isOpen, onClose }: ImportModalProps) {
 				setResult({
 					success: false,
 					imported: 0,
-					errors: ["Unsupported file type. Please upload .xlsx, .xls, or .csv files."],
+					errors: [
+						"Unsupported file type. Please upload .xlsx, .xls, or .csv files.",
+					],
 				});
 				setIsProcessing(false);
 				return;
@@ -87,7 +94,12 @@ export function ImportModal({ isOpen, onClose }: ImportModalProps) {
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={handleClose} title="Import Inventory" size="lg">
+		<Modal
+			isOpen={isOpen}
+			onClose={handleClose}
+			title="Import Inventory"
+			size="lg"
+		>
 			<div className="space-y-6">
 				{!result ? (
 					<div
@@ -175,10 +187,18 @@ export function ImportModal({ isOpen, onClose }: ImportModalProps) {
 										<table className="w-full text-sm">
 											<thead>
 												<tr className="bg-slate-800/50 text-slate-400">
-													<th className="text-left px-4 py-2 font-medium">Name</th>
-													<th className="text-left px-4 py-2 font-medium">Category</th>
-													<th className="text-right px-4 py-2 font-medium">Qty</th>
-													<th className="text-left px-4 py-2 font-medium">Location</th>
+													<th className="text-left px-4 py-2 font-medium">
+														Name
+													</th>
+													<th className="text-left px-4 py-2 font-medium">
+														Category
+													</th>
+													<th className="text-right px-4 py-2 font-medium">
+														Qty
+													</th>
+													<th className="text-left px-4 py-2 font-medium">
+														Location
+													</th>
 												</tr>
 											</thead>
 											<tbody className="divide-y divide-slate-800">
@@ -186,7 +206,9 @@ export function ImportModal({ isOpen, onClose }: ImportModalProps) {
 													<tr key={item.id} className="text-slate-300">
 														<td className="px-4 py-2">{item.name}</td>
 														<td className="px-4 py-2">{item.category}</td>
-														<td className="px-4 py-2 text-right">{item.quantity}</td>
+														<td className="px-4 py-2 text-right">
+															{item.quantity}
+														</td>
 														<td className="px-4 py-2">{item.location}</td>
 													</tr>
 												))}
@@ -203,7 +225,11 @@ export function ImportModal({ isOpen, onClose }: ImportModalProps) {
 						)}
 
 						<div className="flex gap-3 pt-2">
-							<Button variant="secondary" onClick={handleClose} className="flex-1">
+							<Button
+								variant="secondary"
+								onClick={handleClose}
+								className="flex-1"
+							>
 								Cancel
 							</Button>
 							{result.success && (
@@ -231,8 +257,8 @@ export function ImportModal({ isOpen, onClose }: ImportModalProps) {
 						Expected column headers
 					</h4>
 					<p className="text-sm text-slate-500">
-						Name (required), Category, Quantity, Location, Supplier, Reorder Level,
-						Notes, SKU, Unit Cost
+						Name (required), Category, Quantity, Location, Supplier, Reorder
+						Level, Notes, SKU, Unit Cost
 					</p>
 				</div>
 			</div>

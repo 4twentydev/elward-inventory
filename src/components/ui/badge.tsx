@@ -1,13 +1,18 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import type { HTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 	variant?: "amber" | "emerald" | "rose" | "blue" | "slate";
 }
 
-function Badge({ className, variant = "slate", children, ...props }: BadgeProps) {
+function Badge({
+	className,
+	variant = "slate",
+	children,
+	...props
+}: BadgeProps) {
 	return (
 		<span
 			className={cn(
@@ -19,7 +24,7 @@ function Badge({ className, variant = "slate", children, ...props }: BadgeProps)
 					"badge-blue": variant === "blue",
 					"badge-slate": variant === "slate",
 				},
-				className
+				className,
 			)}
 			{...props}
 		>

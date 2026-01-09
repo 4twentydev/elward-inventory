@@ -1,12 +1,12 @@
 "use client";
 
+import { Minus, Package, Plus } from "lucide-react";
 import { useState } from "react";
-import { Modal } from "./ui/modal";
+import type { InventoryItem } from "@/types";
+import { useInventory } from "./inventory-context";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { useInventory } from "./inventory-context";
-import { Minus, Plus, Package } from "lucide-react";
-import type { InventoryItem } from "@/types";
+import { Modal } from "./ui/modal";
 
 interface TransactionModalProps {
 	isOpen: boolean;
@@ -15,7 +15,12 @@ interface TransactionModalProps {
 	type: "pull" | "return";
 }
 
-export function TransactionModal({ isOpen, onClose, item, type }: TransactionModalProps) {
+export function TransactionModal({
+	isOpen,
+	onClose,
+	item,
+	type,
+}: TransactionModalProps) {
 	const { pullItem, returnItem } = useInventory();
 	const [quantity, setQuantity] = useState(1);
 	const [jobRef, setJobRef] = useState("");
@@ -92,7 +97,10 @@ export function TransactionModal({ isOpen, onClose, item, type }: TransactionMod
 							type="number"
 							value={quantity}
 							onChange={(e) => {
-								const val = Math.max(1, Math.min(maxQty, Number(e.target.value)));
+								const val = Math.max(
+									1,
+									Math.min(maxQty, Number(e.target.value)),
+								);
 								setQuantity(val);
 							}}
 							min={1}
@@ -154,7 +162,9 @@ export function TransactionModal({ isOpen, onClose, item, type }: TransactionMod
 						<span className="font-mono text-slate-200">{item.quantity}</span>
 					</div>
 					<div className="flex justify-between text-sm mt-2">
-						<span className="text-slate-400">{isPull ? "After Pull" : "After Return"}</span>
+						<span className="text-slate-400">
+							{isPull ? "After Pull" : "After Return"}
+						</span>
 						<span
 							className={`font-mono ${
 								isPull ? "text-rose-400" : "text-emerald-400"
@@ -166,7 +176,12 @@ export function TransactionModal({ isOpen, onClose, item, type }: TransactionMod
 				</div>
 
 				<div className="flex gap-3 pt-2">
-					<Button type="button" variant="secondary" onClick={onClose} className="flex-1">
+					<Button
+						type="button"
+						variant="secondary"
+						onClick={onClose}
+						className="flex-1"
+					>
 						Cancel
 					</Button>
 					<Button

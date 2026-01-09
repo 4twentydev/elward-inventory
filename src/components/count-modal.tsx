@@ -1,13 +1,13 @@
 "use client";
 
+import { AlertTriangle, CheckCircle, ClipboardCheck } from "lucide-react";
 import { useState } from "react";
-import { Modal } from "./ui/modal";
+import type { InventoryItem } from "@/types";
+import { useInventory } from "./inventory-context";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Modal } from "./ui/modal";
 import { Select } from "./ui/select";
-import { useInventory } from "./inventory-context";
-import { ClipboardCheck, AlertTriangle, CheckCircle } from "lucide-react";
-import type { InventoryItem } from "@/types";
 
 interface CountModalProps {
 	isOpen: boolean;
@@ -18,7 +18,9 @@ interface CountModalProps {
 export function CountModal({ isOpen, onClose, item }: CountModalProps) {
 	const { recordCount } = useInventory();
 	const [countedQty, setCountedQty] = useState<number | "">("");
-	const [countType, setCountType] = useState<"quarterly" | "daily" | "spot">("spot");
+	const [countType, setCountType] = useState<"quarterly" | "daily" | "spot">(
+		"spot",
+	);
 	const [notes, setNotes] = useState("");
 
 	const handleSubmit = (e: React.FormEvent) => {
@@ -141,7 +143,12 @@ export function CountModal({ isOpen, onClose, item }: CountModalProps) {
 				</div>
 
 				<div className="flex gap-3 pt-2">
-					<Button type="button" variant="secondary" onClick={onClose} className="flex-1">
+					<Button
+						type="button"
+						variant="secondary"
+						onClick={onClose}
+						className="flex-1"
+					>
 						Cancel
 					</Button>
 					<Button type="submit" className="flex-1" disabled={countedQty === ""}>

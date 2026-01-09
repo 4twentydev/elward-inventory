@@ -1,25 +1,35 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
 	try {
 		const { question, inventory, conversationHistory } = await request.json();
 
 		if (!question) {
-			return NextResponse.json({ error: "No question provided" }, { status: 400 });
+			return NextResponse.json(
+				{ error: "No question provided" },
+				{ status: 400 },
+			);
 		}
 
 		if (!inventory || !Array.isArray(inventory)) {
-			return NextResponse.json({ error: "No inventory data provided" }, { status: 400 });
+			return NextResponse.json(
+				{ error: "No inventory data provided" },
+				{ status: 400 },
+			);
 		}
 
 		// Check for API key
 		const apiKey = process.env.ANTHROPIC_API_KEY;
 
 		if (!apiKey) {
-			return NextResponse.json({
-				answer: "Sorry, the AI assistant is not configured. Please add ANTHROPIC_API_KEY to your environment variables.",
-				error: "API key not configured",
-			}, { status: 503 });
+			return NextResponse.json(
+				{
+					answer:
+						"Sorry, the AI assistant is not configured. Please add ANTHROPIC_API_KEY to your environment variables.",
+					error: "API key not configured",
+				},
+				{ status: 503 },
+			);
 		}
 
 		// Prepare inventory data summary
@@ -91,7 +101,7 @@ Please provide a helpful, concise answer based on the inventory data. If you're 
 		console.error("AI assistant error:", error);
 		return NextResponse.json(
 			{ error: error instanceof Error ? error.message : "Assistant failed" },
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }

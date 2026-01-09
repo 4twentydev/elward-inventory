@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import type { HTMLAttributes, ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
 	children: ReactNode;
@@ -33,7 +33,10 @@ interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
 
 export function CardTitle({ className, children, ...props }: CardTitleProps) {
 	return (
-		<h3 className={cn("text-lg font-semibold text-slate-100", className)} {...props}>
+		<h3
+			className={cn("text-lg font-semibold text-slate-100", className)}
+			{...props}
+		>
 			{children}
 		</h3>
 	);

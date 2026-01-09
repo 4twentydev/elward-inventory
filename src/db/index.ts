@@ -11,7 +11,7 @@ export const db = sql ? drizzle(sql, { schema }) : null;
 export function getDb() {
 	if (!db) {
 		throw new Error(
-			"Database not configured. Set POSTGRES_URL environment variable."
+			"Database not configured. Set POSTGRES_URL environment variable.",
 		);
 	}
 	return db;

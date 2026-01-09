@@ -1,9 +1,9 @@
 "use server";
 
+import { and, desc, eq, gte, lte, sql } from "drizzle-orm";
 import { db, isDbConfigured } from "@/db";
-import { items, transactions, counts } from "@/db/schema";
-import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
-import type { Item, NewItem, NewTransaction, NewCount } from "@/db/schema";
+import type { Item, NewCount, NewItem, NewTransaction } from "@/db/schema";
+import { counts, items, transactions } from "@/db/schema";
 
 export async function getItems(): Promise<Item[]> {
 	if (!isDbConfigured() || !db) return [];
@@ -24,7 +24,7 @@ export async function createItem(item: NewItem): Promise<Item> {
 
 export async function updateItem(
 	id: string,
-	updates: Partial<NewItem>
+	updates: Partial<NewItem>,
 ): Promise<Item | null> {
 	if (!isDbConfigured() || !db) throw new Error("Database not configured");
 	const result = await db
@@ -56,16 +56,14 @@ export async function getLowStockItems(): Promise<Item[]> {
 		.where(
 			and(
 				sql`${items.quantity} <= ${items.reorderLevel}`,
-				sql`${items.reorderLevel} > 0`
-			)
+				sql`${items.reorderLevel} > 0`,
+			),
 		)
 		.orderBy(items.name);
 }
 
 // Transactions
-export async function createTransaction(
-	tx: NewTransaction
-): Promise<void> {
+export async function createTransaction(tx: NewTransaction): Promise<void> {
 	if (!isDbConfigured() || !db) throw new Error("Database not configured");
 	await db.insert(transactions).values(tx);
 }
@@ -81,7 +79,7 @@ export async function getItemTransactions(itemId: string) {
 
 export async function getTransactionsByDateRange(
 	startDate: Date,
-	endDate: Date
+	endDate: Date,
 ) {
 	if (!isDbConfigured() || !db) return [];
 	return db
@@ -90,8 +88,8 @@ export async function getTransactionsByDateRange(
 		.where(
 			and(
 				gte(transactions.createdAt, startDate),
-				lte(transactions.createdAt, endDate)
-			)
+				lte(transactions.createdAt, endDate),
+			),
 		)
 		.orderBy(desc(transactions.createdAt));
 }
@@ -117,7 +115,7 @@ export async function getCountsByDateRange(startDate: Date, endDate: Date) {
 		.select()
 		.from(counts)
 		.where(
-			and(gte(counts.createdAt, startDate), lte(counts.createdAt, endDate))
+			and(gte(counts.createdAt, startDate), lte(counts.createdAt, endDate)),
 		)
 		.orderBy(desc(counts.createdAt));
 }
@@ -141,7 +139,7 @@ export async function getInventoryStats() {
 	}, 0);
 
 	const lowStockCount = allItems.filter(
-		(item) => item.quantity <= item.reorderLevel && item.reorderLevel > 0
+		(item) => item.quantity <= item.reorderLevel && item.reorderLevel > 0,
 	).length;
 
 	const categoryCounts: Record<string, number> = {};

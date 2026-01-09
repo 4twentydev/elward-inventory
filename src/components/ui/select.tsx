@@ -1,8 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { forwardRef } from "react";
 import type { SelectHTMLAttributes } from "react";
+import { forwardRef } from "react";
+import { cn } from "@/lib/utils";
 
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 	selectSize?: "sm" | "md" | "lg";
@@ -19,14 +19,14 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 						"input-lg": selectSize === "lg",
 						"px-3 py-1.5 text-xs": selectSize === "sm",
 					},
-					className
+					className,
 				)}
 				{...props}
 			>
 				{children}
 			</select>
 		);
-	}
+	},
 );
 
 Select.displayName = "Select";
