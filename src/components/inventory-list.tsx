@@ -24,7 +24,7 @@ import {
 	Users,
 	X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { exportToCSV, exportToExcel } from "@/lib/import-export";
 import type { InventoryItem, ItemCategory } from "@/types";
 import { AICountModal } from "./ai-count-modal";
@@ -74,12 +74,20 @@ function getCategoryBadgeVariant(category: ItemCategory) {
 	}
 }
 
-export function InventoryList() {
+interface InventoryListProps {
+	initialCategory?: ItemCategory;
+	onClearCategory?: () => void;
+}
+
+export function InventoryList({
+	initialCategory,
+	onClearCategory,
+}: InventoryListProps) {
 	const { items, currentUser, logout, getLowStockItems } = useInventory();
 
 	const [searchQuery, setSearchQuery] = useState("");
 	const [categoryFilter, setCategoryFilter] = useState<ItemCategory | "all">(
-		"all",
+		initialCategory || "all",
 	);
 	const [showLowStockOnly, setShowLowStockOnly] = useState(false);
 
@@ -108,6 +116,13 @@ export function InventoryList() {
 	const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
 
 	const lowStockItems = getLowStockItems();
+
+	// Update category filter when initialCategory changes (from Dashboard)
+	useEffect(() => {
+		if (initialCategory) {
+			setCategoryFilter(initialCategory);
+		}
+	}, [initialCategory]);
 
 	const filteredItems = useMemo(() => {
 		let result = items;
@@ -205,44 +220,38 @@ export function InventoryList() {
 	};
 
 	return (
-		<div className="min-h-screen bg-slate-950">
+		<div className="flex-1 flex flex-col overflow-hidden">
 			{/* Header */}
 			<header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur border-b border-slate-800">
-				<div className="max-w-7xl mx-auto px-4 py-4">
+				<div className="max-w-7xl mx-auto px-6 py-4">
 					<div className="flex items-center justify-between gap-4">
-						<div className="flex items-center gap-3">
-							<div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
-								<Package className="w-5 h-5 text-amber-500" />
-							</div>
-							<div>
-								<h1 className="text-lg font-bold text-slate-100">
-									Elward Inventory
-								</h1>
-								<p className="text-xs text-slate-500">
-									{currentUser?.name} • {items.length} items
-								</p>
-							</div>
+						<div>
+							<h1 className="text-2xl font-bold text-white">Inventory</h1>
+							<p className="text-sm text-slate-400">
+								{items.length} item{items.length !== 1 ? "s" : ""} total
+								{categoryFilter !== "all" &&
+									` • Filtering: ${categoryFilter}`}
+							</p>
 						</div>
-
-						<div className="flex items-center gap-2">
-							{currentUser?.role === "admin" && (
-								<Button
-									variant="ghost"
-									size="sm"
-									onClick={() => setShowUserManagement(true)}
-								>
-									<Users className="w-4 h-4" />
-								</Button>
-							)}
-							<Button variant="ghost" size="sm" onClick={logout}>
-								<LogOut className="w-4 h-4" />
+						{initialCategory && onClearCategory && (
+							<Button
+								variant="secondary"
+								size="sm"
+								onClick={() => {
+									setCategoryFilter("all");
+									onClearCategory();
+								}}
+							>
+								<X className="w-4 h-4" />
+								Clear Filter
 							</Button>
-						</div>
+						)}
 					</div>
 				</div>
 			</header>
 
-			{/* Low Stock Alert */}
+			<div className="flex-1 overflow-y-auto">
+				{/* Low Stock Alert */}
 			{lowStockItems.length > 0 && !showLowStockOnly && (
 				<div className="max-w-7xl mx-auto px-4 pt-4">
 					<button
@@ -528,6 +537,7 @@ export function InventoryList() {
 						})}
 					</div>
 				)}
+			</div>
 			</div>
 
 			{/* Modals */}
