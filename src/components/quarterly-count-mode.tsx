@@ -20,6 +20,7 @@ import {
 	CheckCircle2,
 } from "lucide-react";
 import type { InventoryItem, ItemCategory } from "@/types";
+import { getLocationTerm } from "@/lib/location-terminology";
 
 interface CountModeProps {
 	isOpen: boolean;
@@ -423,7 +424,11 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 											)}
 											<div className="flex-1 min-w-0">
 												<p className="text-slate-200 truncate">{item.name}</p>
-												<p className="text-xs text-slate-500">{item.location}</p>
+												{item.location && (
+													<p className="text-xs text-slate-500">
+														{getLocationTerm(item.category)}: {item.location}
+													</p>
+												)}
 											</div>
 											{counted && (
 												<span
@@ -484,7 +489,7 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 										</h2>
 										{currentItem.location && (
 											<p className="text-slate-400 mt-1">
-												📍 {currentItem.location}
+												📍 {getLocationTerm(currentItem.category)}: {currentItem.location}
 											</p>
 										)}
 									</div>

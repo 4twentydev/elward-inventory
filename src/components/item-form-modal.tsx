@@ -7,6 +7,10 @@ import { Input } from "./ui/input";
 import { Select } from "./ui/select";
 import { useInventory } from "./inventory-context";
 import type { InventoryItem, ItemCategory } from "@/types";
+import {
+	getLocationTermCapitalized,
+	getLocationPlaceholder,
+} from "@/lib/location-terminology";
 
 interface ItemFormModalProps {
 	isOpen: boolean;
@@ -148,12 +152,12 @@ export function ItemFormModal({ isOpen, onClose, item }: ItemFormModalProps) {
 
 					<div>
 						<label className="block text-sm font-medium text-slate-300 mb-1.5">
-							Location
+							{getLocationTermCapitalized(formData.category)}
 						</label>
 						<Input
 							value={formData.location}
 							onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-							placeholder="e.g., Warehouse A, Rack 3"
+							placeholder={getLocationPlaceholder(formData.category)}
 							inputSize="lg"
 						/>
 					</div>

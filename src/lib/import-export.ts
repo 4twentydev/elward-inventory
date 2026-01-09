@@ -59,7 +59,7 @@ export function parseExcelFile(buffer: ArrayBuffer): ImportResult {
 		const nameIdx = findColumnIndex(headers, ["name", "item", "item name", "description", "product", "part_number", "part number", "job", "job_number", "tent", "pallet_number", "row"]);
 		const categoryIdx = findColumnIndex(headers, ["category", "type", "cat"]);
 		const quantityIdx = findColumnIndex(headers, ["quantity", "qty", "count", "stock", "on hand", "total", "each_quantity"]);
-		const locationIdx = findColumnIndex(headers, ["location", "loc", "bin", "warehouse", "tent"]);
+		const locationIdx = findColumnIndex(headers, ["location", "loc", "bin", "warehouse", "tent", "rack", "row", "rivet room"]);
 		const supplierIdx = findColumnIndex(headers, ["supplier", "vendor", "manufacturer"]);
 		const reorderIdx = findColumnIndex(headers, ["reorder", "reorder level", "min", "minimum"]);
 		const notesIdx = findColumnIndex(headers, ["notes", "note", "comments", "description", "color", "size", "thickness", "unit"]);
@@ -149,7 +149,7 @@ export function parseCSVFile(content: string): ImportResult {
 		const nameIdx = findColumnIndex(headers, ["name", "profile", "item", "description", "part_number", "part number", "job", "job_number", "tent", "pallet_number", "row"]);
 		const categoryIdx = findColumnIndex(headers, ["category", "type"]);
 		const quantityIdx = findColumnIndex(headers, ["quantity", "qty", "count", "total", "each_quantity"]);
-		const locationIdx = findColumnIndex(headers, ["location", "loc", "tent"]);
+		const locationIdx = findColumnIndex(headers, ["location", "loc", "tent", "rack", "row", "rivet room"]);
 		const supplierIdx = findColumnIndex(headers, ["supplier", "vendor"]);
 		const notesIdx = findColumnIndex(headers, ["notes", "note", "color", "size", "thickness", "unit"]);
 		const skuIdx = findColumnIndex(headers, ["sku", "part", "code", "part_number", "part number", "pallet_number"]);
