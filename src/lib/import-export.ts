@@ -79,58 +79,13 @@ export function parseExcelFile(buffer: ArrayBuffer): ImportResult {
 			"row",
 		]);
 		const categoryIdx = findColumnIndex(headers, ["category", "type", "cat"]);
-		const quantityIdx = findColumnIndex(headers, [
-			"quantity",
-			"qty",
-			"count",
-			"stock",
-			"on hand",
-			"total",
-			"each_quantity",
-		]);
-		const locationIdx = findColumnIndex(headers, [
-			"location",
-			"loc",
-			"bin",
-			"warehouse",
-			"tent",
-		]);
-		const supplierIdx = findColumnIndex(headers, [
-			"supplier",
-			"vendor",
-			"manufacturer",
-		]);
-		const reorderIdx = findColumnIndex(headers, [
-			"reorder",
-			"reorder level",
-			"min",
-			"minimum",
-		]);
-		const notesIdx = findColumnIndex(headers, [
-			"notes",
-			"note",
-			"comments",
-			"description",
-			"color",
-			"size",
-			"thickness",
-			"unit",
-		]);
-		const skuIdx = findColumnIndex(headers, [
-			"sku",
-			"part number",
-			"part_number",
-			"part",
-			"code",
-			"item number",
-			"pallet_number",
-		]);
-		const costIdx = findColumnIndex(headers, [
-			"cost",
-			"price",
-			"unit cost",
-			"unit price",
-		]);
+		const quantityIdx = findColumnIndex(headers, ["quantity", "qty", "count", "stock", "on hand", "total", "each_quantity"]);
+		const locationIdx = findColumnIndex(headers, ["location", "loc", "bin", "warehouse", "tent", "rack", "row", "rivet room"]);
+		const supplierIdx = findColumnIndex(headers, ["supplier", "vendor", "manufacturer"]);
+		const reorderIdx = findColumnIndex(headers, ["reorder", "reorder level", "min", "minimum"]);
+		const notesIdx = findColumnIndex(headers, ["notes", "note", "comments", "description", "color", "size", "thickness", "unit"]);
+		const skuIdx = findColumnIndex(headers, ["sku", "part number", "part_number", "part", "code", "item number", "pallet_number"]);
+		const costIdx = findColumnIndex(headers, ["cost", "price", "unit cost", "unit price"]);
 
 		if (nameIdx === -1) {
 			return {
@@ -243,14 +198,8 @@ export function parseCSVFile(content: string): ImportResult {
 			"row",
 		]);
 		const categoryIdx = findColumnIndex(headers, ["category", "type"]);
-		const quantityIdx = findColumnIndex(headers, [
-			"quantity",
-			"qty",
-			"count",
-			"total",
-			"each_quantity",
-		]);
-		const locationIdx = findColumnIndex(headers, ["location", "loc", "tent"]);
+		const quantityIdx = findColumnIndex(headers, ["quantity", "qty", "count", "total", "each_quantity"]);
+		const locationIdx = findColumnIndex(headers, ["location", "loc", "tent", "rack", "row", "rivet room"]);
 		const supplierIdx = findColumnIndex(headers, ["supplier", "vendor"]);
 		const notesIdx = findColumnIndex(headers, [
 			"notes",
