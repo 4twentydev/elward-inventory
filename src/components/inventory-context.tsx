@@ -2,14 +2,14 @@
 
 import {
 	createContext,
-	useContext,
-	useState,
-	useEffect,
-	useCallback,
 	type ReactNode,
+	useCallback,
+	useContext,
+	useEffect,
+	useState,
 } from "react";
-import type { InventoryItem, User, Transaction, InventoryCount } from "@/types";
 import * as store from "@/lib/store";
+import type { InventoryCount, InventoryItem, Transaction, User } from "@/types";
 
 interface InventoryContextType {
 	items: InventoryItem[];
@@ -22,13 +22,30 @@ interface InventoryContextType {
 	updateItem: (id: string, updates: Partial<InventoryItem>) => void;
 	deleteItem: (id: string) => void;
 	importItems: (items: InventoryItem[]) => void;
-	pullItem: (itemId: string, quantity: number, jobRef?: string, notes?: string) => void;
-	returnItem: (itemId: string, quantity: number, jobRef?: string, notes?: string) => void;
+	pullItem: (
+		itemId: string,
+		quantity: number,
+		jobRef?: string,
+		notes?: string,
+	) => void;
+	returnItem: (
+		itemId: string,
+		quantity: number,
+		jobRef?: string,
+		notes?: string,
+	) => void;
+	transferItem: (
+		itemId: string,
+		quantity: number,
+		fromLocation: string,
+		toLocation: string,
+		notes?: string,
+	) => void;
 	recordCount: (
 		itemId: string,
 		countedQty: number,
 		countType: "quarterly" | "daily" | "spot",
-		notes?: string
+		notes?: string,
 	) => void;
 	getItemTransactions: (itemId: string) => Transaction[];
 	getLowStockItems: () => InventoryItem[];
@@ -70,10 +87,13 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
 		setItems(store.getItems());
 	}, []);
 
-	const updateItem = useCallback((id: string, updates: Partial<InventoryItem>) => {
-		store.updateItem(id, updates);
-		setItems(store.getItems());
-	}, []);
+	const updateItem = useCallback(
+		(id: string, updates: Partial<InventoryItem>) => {
+			store.updateItem(id, updates);
+			setItems(store.getItems());
+		},
+		[],
+	);
 
 	const deleteItem = useCallback((id: string) => {
 		store.deleteItem(id);
@@ -111,7 +131,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
 			store.updateItem(itemId, { quantity: newQty });
 			setItems(store.getItems());
 		},
-		[currentUser]
+		[currentUser],
 	);
 
 	const returnItem = useCallback(
@@ -140,7 +160,42 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
 			store.updateItem(itemId, { quantity: newQty });
 			setItems(store.getItems());
 		},
-		[currentUser]
+		[currentUser],
+	);
+
+	const transferItem = useCallback(
+		(
+			itemId: string,
+			quantity: number,
+			fromLocation: string,
+			toLocation: string,
+			notes?: string,
+		) => {
+			if (!currentUser) return;
+
+			const item = store.getItem(itemId);
+			if (!item) return;
+
+			const transaction: Transaction = {
+				id: crypto.randomUUID(),
+				itemId,
+				type: "transfer",
+				quantity,
+				previousQuantity: item.quantity,
+				newQuantity: item.quantity,
+				userId: currentUser.id,
+				userName: currentUser.name,
+				fromLocation,
+				toLocation,
+				notes,
+				createdAt: new Date().toISOString(),
+			};
+
+			store.addTransaction(transaction);
+			store.updateItem(itemId, { location: toLocation });
+			setItems(store.getItems());
+		},
+		[currentUser],
 	);
 
 	const recordCount = useCallback(
@@ -148,7 +203,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
 			itemId: string,
 			countedQty: number,
 			countType: "quarterly" | "daily" | "spot",
-			notes?: string
+			notes?: string,
 		) => {
 			if (!currentUser) return;
 
@@ -194,7 +249,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
 			});
 			setItems(store.getItems());
 		},
-		[currentUser]
+		[currentUser],
 	);
 
 	const getItemTransactions = useCallback((itemId: string): Transaction[] => {
@@ -202,7 +257,9 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
 	}, []);
 
 	const getLowStockItems = useCallback((): InventoryItem[] => {
-		return items.filter((item) => item.quantity <= item.reorderLevel && item.reorderLevel > 0);
+		return items.filter(
+			(item) => item.quantity <= item.reorderLevel && item.reorderLevel > 0,
+		);
 	}, [items]);
 
 	return (
@@ -220,6 +277,7 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
 				importItems: importItemsFn,
 				pullItem,
 				returnItem,
+				transferItem,
 				recordCount,
 				getItemTransactions,
 				getLowStockItems,

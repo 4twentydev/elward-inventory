@@ -1,9 +1,10 @@
 import type {
+	AICountLog,
+	ChatMessage,
+	InventoryCount,
 	InventoryItem,
 	Transaction,
-	InventoryCount,
 	User,
-	AICountLog,
 } from "@/types";
 
 const STORAGE_KEYS = {
@@ -13,6 +14,7 @@ const STORAGE_KEYS = {
 	USERS: "elward_inventory_users",
 	AI_LOGS: "elward_inventory_ai_logs",
 	CURRENT_USER: "elward_inventory_current_user",
+	CHAT_MESSAGES: "elward_inventory_chat_messages",
 };
 
 function getStorage<T>(key: string, defaultValue: T): T {
@@ -45,7 +47,11 @@ export function updateItem(id: string, updates: Partial<InventoryItem>): void {
 	const items = getItems();
 	const index = items.findIndex((i) => i.id === id);
 	if (index !== -1) {
-		items[index] = { ...items[index], ...updates, updatedAt: new Date().toISOString() };
+		items[index] = {
+			...items[index],
+			...updates,
+			updatedAt: new Date().toISOString(),
+		};
 		setItems(items);
 	}
 }
@@ -133,6 +139,27 @@ export function addAILog(log: AICountLog): void {
 	const logs = getAILogs();
 	logs.unshift(log);
 	setStorage(STORAGE_KEYS.AI_LOGS, logs);
+}
+
+// Chat Messages
+export function getChatMessages(userId?: string): ChatMessage[] {
+	const allMessages = getStorage<ChatMessage[]>(STORAGE_KEYS.CHAT_MESSAGES, []);
+	if (userId) {
+		return allMessages.filter((msg) => msg.userId === userId);
+	}
+	return allMessages;
+}
+
+export function addChatMessage(message: ChatMessage): void {
+	const messages = getStorage<ChatMessage[]>(STORAGE_KEYS.CHAT_MESSAGES, []);
+	messages.push(message);
+	setStorage(STORAGE_KEYS.CHAT_MESSAGES, messages);
+}
+
+export function clearChatMessages(userId: string): void {
+	const allMessages = getStorage<ChatMessage[]>(STORAGE_KEYS.CHAT_MESSAGES, []);
+	const filtered = allMessages.filter((msg) => msg.userId !== userId);
+	setStorage(STORAGE_KEYS.CHAT_MESSAGES, filtered);
 }
 
 // Bulk import

@@ -1,48 +1,51 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import {
+	AlertTriangle,
+	ArrowDownToLine,
+	ArrowRightLeft,
+	BarChart3,
+	ClipboardCheck,
+	Download,
+	Filter,
+	History,
+	ListChecks,
+	LogOut,
+	MessageSquare,
+	Minus,
+	MoreVertical,
+	Package,
+	Plus,
+	Printer,
+	QrCode,
+	Search,
+	Sparkles,
+	Upload,
+	Users,
+	X,
+} from "lucide-react";
+import { useMemo, useState } from "react";
+import { exportToCSV, exportToExcel } from "@/lib/import-export";
+import type { InventoryItem, ItemCategory } from "@/types";
+import { AICountModal } from "./ai-count-modal";
+import { AnalyticsDashboard } from "./analytics-dashboard";
+import { AssistantModal } from "./assistant-modal";
+import { ChatModal } from "./chat-modal";
+import { CountModal } from "./count-modal";
+import { ImportModal } from "./import-modal";
 import { useInventory } from "./inventory-context";
+import { ItemFormModal } from "./item-form-modal";
+import { ItemHistoryModal } from "./item-history-modal";
+import { LabelModal } from "./label-modal";
+import { QuarterlyCountMode } from "./quarterly-count-mode";
+import { TransactionModal } from "./transaction-modal";
+import { TransferModal } from "./transfer-modal";
+import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
+import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Select } from "./ui/select";
-import { Badge } from "./ui/badge";
-import { Card } from "./ui/card";
-import { ImportModal } from "./import-modal";
-import { ItemFormModal } from "./item-form-modal";
-import { TransactionModal } from "./transaction-modal";
-import { CountModal } from "./count-modal";
-import { ItemHistoryModal } from "./item-history-modal";
-import { AICountModal } from "./ai-count-modal";
-import { AssistantModal } from "./assistant-modal";
-import { QuarterlyCountMode } from "./quarterly-count-mode";
-import { LabelModal } from "./label-modal";
-import { AnalyticsDashboard } from "./analytics-dashboard";
 import { UserManagement } from "./user-management";
-import { exportToCSV, exportToExcel } from "@/lib/import-export";
-import {
-	Search,
-	Plus,
-	Upload,
-	Download,
-	Package,
-	LogOut,
-	Minus,
-	ArrowDownToLine,
-	ClipboardCheck,
-	History,
-	MoreVertical,
-	AlertTriangle,
-	Sparkles,
-	Filter,
-	X,
-	QrCode,
-	BarChart3,
-	ListChecks,
-	Printer,
-	Users,
-	MessageSquare,
-} from "lucide-react";
-import type { InventoryItem, ItemCategory } from "@/types";
 
 const CATEGORIES: ItemCategory[] = [
 	"ACM",
@@ -75,22 +78,29 @@ export function InventoryList() {
 	const { items, currentUser, logout, getLowStockItems } = useInventory();
 
 	const [searchQuery, setSearchQuery] = useState("");
-	const [categoryFilter, setCategoryFilter] = useState<ItemCategory | "all">("all");
+	const [categoryFilter, setCategoryFilter] = useState<ItemCategory | "all">(
+		"all",
+	);
 	const [showLowStockOnly, setShowLowStockOnly] = useState(false);
 
 	const [showImportModal, setShowImportModal] = useState(false);
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [showAICountModal, setShowAICountModal] = useState(false);
 	const [showAssistant, setShowAssistant] = useState(false);
+	const [showChatModal, setShowChatModal] = useState(false);
 	const [showCountMode, setShowCountMode] = useState(false);
 	const [showLabelModal, setShowLabelModal] = useState(false);
 	const [showAnalytics, setShowAnalytics] = useState(false);
 	const [showUserManagement, setShowUserManagement] = useState(false);
+	const [showTransferModal, setShowTransferModal] = useState(false);
 	const [labelItem, setLabelItem] = useState<InventoryItem | null>(null);
+	const [transferItem, setTransferItem] = useState<InventoryItem | null>(null);
 
 	const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
 	const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
-	const [transactionType, setTransactionType] = useState<"pull" | "return">("pull");
+	const [transactionType, setTransactionType] = useState<"pull" | "return">(
+		"pull",
+	);
 	const [showTransactionModal, setShowTransactionModal] = useState(false);
 	const [showCountModal, setShowCountModal] = useState(false);
 	const [showHistoryModal, setShowHistoryModal] = useState(false);
@@ -109,7 +119,7 @@ export function InventoryList() {
 					item.name.toLowerCase().includes(query) ||
 					item.sku?.toLowerCase().includes(query) ||
 					item.location.toLowerCase().includes(query) ||
-					item.supplier.toLowerCase().includes(query)
+					item.supplier.toLowerCase().includes(query),
 			);
 		}
 
@@ -119,7 +129,7 @@ export function InventoryList() {
 
 		if (showLowStockOnly) {
 			result = result.filter(
-				(item) => item.quantity <= item.reorderLevel && item.reorderLevel > 0
+				(item) => item.quantity <= item.reorderLevel && item.reorderLevel > 0,
 			);
 		}
 
@@ -188,6 +198,12 @@ export function InventoryList() {
 		setExpandedItemId(null);
 	};
 
+	const openTransfer = (item: InventoryItem) => {
+		setTransferItem(item);
+		setShowTransferModal(true);
+		setExpandedItemId(null);
+	};
+
 	return (
 		<div className="min-h-screen bg-slate-950">
 			{/* Header */}
@@ -199,7 +215,9 @@ export function InventoryList() {
 								<Package className="w-5 h-5 text-amber-500" />
 							</div>
 							<div>
-								<h1 className="text-lg font-bold text-slate-100">Elward Inventory</h1>
+								<h1 className="text-lg font-bold text-slate-100">
+									Elward Inventory
+								</h1>
 								<p className="text-xs text-slate-500">
 									{currentUser?.name} • {items.length} items
 								</p>
@@ -208,7 +226,11 @@ export function InventoryList() {
 
 						<div className="flex items-center gap-2">
 							{currentUser?.role === "admin" && (
-								<Button variant="ghost" size="sm" onClick={() => setShowUserManagement(true)}>
+								<Button
+									variant="ghost"
+									size="sm"
+									onClick={() => setShowUserManagement(true)}
+								>
 									<Users className="w-4 h-4" />
 								</Button>
 							)}
@@ -230,15 +252,16 @@ export function InventoryList() {
 						<AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
 						<div className="flex-1">
 							<p className="font-medium text-amber-400">
-								{lowStockItems.length} item{lowStockItems.length !== 1 ? "s" : ""} below
-								reorder level
+								{lowStockItems.length} item
+								{lowStockItems.length !== 1 ? "s" : ""} below reorder level
 							</p>
 							<p className="text-sm text-slate-400">
 								{lowStockItems
 									.slice(0, 3)
 									.map((i) => i.name)
 									.join(", ")}
-								{lowStockItems.length > 3 && ` and ${lowStockItems.length - 3} more`}
+								{lowStockItems.length > 3 &&
+									` and ${lowStockItems.length - 3} more`}
 							</p>
 						</div>
 					</button>
@@ -268,15 +291,22 @@ export function InventoryList() {
 						<MessageSquare className="w-4 h-4" />
 						Assistant
 					</Button>
+					<Button variant="secondary" onClick={() => setShowChatModal(true)}>
+						<MessageSquare className="w-4 h-4" />
+						Chat
+					</Button>
 					<div className="flex-1" />
 					<Button variant="ghost" onClick={() => setShowAnalytics(true)}>
 						<BarChart3 className="w-4 h-4" />
 						Analytics
 					</Button>
-					<Button variant="ghost" onClick={() => {
-						setLabelItem(null);
-						setShowLabelModal(true);
-					}}>
+					<Button
+						variant="ghost"
+						onClick={() => {
+							setLabelItem(null);
+							setShowLabelModal(true);
+						}}
+					>
 						<Printer className="w-4 h-4" />
 						Labels
 					</Button>
@@ -306,7 +336,9 @@ export function InventoryList() {
 					</div>
 					<Select
 						value={categoryFilter}
-						onChange={(e) => setCategoryFilter(e.target.value as ItemCategory | "all")}
+						onChange={(e) =>
+							setCategoryFilter(e.target.value as ItemCategory | "all")
+						}
 						className="sm:w-48"
 						selectSize="lg"
 					>
@@ -336,7 +368,9 @@ export function InventoryList() {
 				{filteredItems.length === 0 ? (
 					<Card className="p-12 text-center">
 						<Package className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-						<h3 className="text-lg font-medium text-slate-300 mb-2">No items found</h3>
+						<h3 className="text-lg font-medium text-slate-300 mb-2">
+							No items found
+						</h3>
 						<p className="text-slate-500 mb-4">
 							{items.length === 0
 								? "Get started by adding items or importing from a spreadsheet."
@@ -348,7 +382,10 @@ export function InventoryList() {
 									<Plus className="w-4 h-4" />
 									Add Item
 								</Button>
-								<Button variant="secondary" onClick={() => setShowImportModal(true)}>
+								<Button
+									variant="secondary"
+									onClick={() => setShowImportModal(true)}
+								>
 									<Upload className="w-4 h-4" />
 									Import
 								</Button>
@@ -392,7 +429,9 @@ export function InventoryList() {
 											<div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
 												{item.location && <span>{item.location}</span>}
 												{item.sku && (
-													<span className="font-mono text-slate-600">{item.sku}</span>
+													<span className="font-mono text-slate-600">
+														{item.sku}
+													</span>
 												)}
 											</div>
 										</div>
@@ -443,19 +482,43 @@ export function InventoryList() {
 									{/* Expanded actions */}
 									{isExpanded && (
 										<div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-800">
-											<Button variant="secondary" size="sm" onClick={() => openCount(item)}>
+											<Button
+												variant="secondary"
+												size="sm"
+												onClick={() => openCount(item)}
+											>
 												<ClipboardCheck className="w-4 h-4" />
 												Count
 											</Button>
-											<Button variant="secondary" size="sm" onClick={() => openHistory(item)}>
+											<Button
+												variant="secondary"
+												size="sm"
+												onClick={() => openTransfer(item)}
+											>
+												<ArrowRightLeft className="w-4 h-4" />
+												Transfer
+											</Button>
+											<Button
+												variant="secondary"
+												size="sm"
+												onClick={() => openHistory(item)}
+											>
 												<History className="w-4 h-4" />
 												History
 											</Button>
-											<Button variant="secondary" size="sm" onClick={() => openLabel(item)}>
+											<Button
+												variant="secondary"
+												size="sm"
+												onClick={() => openLabel(item)}
+											>
 												<QrCode className="w-4 h-4" />
 												Label
 											</Button>
-											<Button variant="secondary" size="sm" onClick={() => openEdit(item)}>
+											<Button
+												variant="secondary"
+												size="sm"
+												onClick={() => openEdit(item)}
+											>
 												Edit Details
 											</Button>
 										</div>
@@ -468,7 +531,10 @@ export function InventoryList() {
 			</div>
 
 			{/* Modals */}
-			<ImportModal isOpen={showImportModal} onClose={() => setShowImportModal(false)} />
+			<ImportModal
+				isOpen={showImportModal}
+				onClose={() => setShowImportModal(false)}
+			/>
 			<ItemFormModal
 				isOpen={showAddModal}
 				onClose={() => {
@@ -493,9 +559,27 @@ export function InventoryList() {
 				onClose={() => setShowHistoryModal(false)}
 				item={selectedItem}
 			/>
-			<AICountModal isOpen={showAICountModal} onClose={() => setShowAICountModal(false)} />
-			<AssistantModal isOpen={showAssistant} onClose={() => setShowAssistant(false)} />
-			<QuarterlyCountMode isOpen={showCountMode} onClose={() => setShowCountMode(false)} />
+			<AICountModal
+				isOpen={showAICountModal}
+				onClose={() => setShowAICountModal(false)}
+			/>
+			<AssistantModal
+				isOpen={showAssistant}
+				onClose={() => setShowAssistant(false)}
+			/>
+			<ChatModal
+				isOpen={showChatModal}
+				onClose={() => setShowChatModal(false)}
+			/>
+			<TransferModal
+				isOpen={showTransferModal}
+				onClose={() => setShowTransferModal(false)}
+				item={transferItem}
+			/>
+			<QuarterlyCountMode
+				isOpen={showCountMode}
+				onClose={() => setShowCountMode(false)}
+			/>
 			<LabelModal
 				isOpen={showLabelModal}
 				onClose={() => {
@@ -504,8 +588,14 @@ export function InventoryList() {
 				}}
 				item={labelItem}
 			/>
-			<AnalyticsDashboard isOpen={showAnalytics} onClose={() => setShowAnalytics(false)} />
-			<UserManagement isOpen={showUserManagement} onClose={() => setShowUserManagement(false)} />
+			<AnalyticsDashboard
+				isOpen={showAnalytics}
+				onClose={() => setShowAnalytics(false)}
+			/>
+			<UserManagement
+				isOpen={showUserManagement}
+				onClose={() => setShowUserManagement(false)}
+			/>
 		</div>
 	);
 }
