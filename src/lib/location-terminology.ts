@@ -8,9 +8,7 @@ import type { InventoryItem } from "@/types";
  * - Hardware (rivets) → "rivet room"
  * - Other categories → "location"
  */
-export function getLocationTerm(
-	category: InventoryItem["category"],
-): string {
+export function getLocationTerm(category: InventoryItem["category"]): string {
 	switch (category) {
 		case "Extrusions":
 			return "rack";

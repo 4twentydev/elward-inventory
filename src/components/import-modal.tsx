@@ -257,8 +257,9 @@ export function ImportModal({ isOpen, onClose }: ImportModalProps) {
 						Expected column headers
 					</h4>
 					<p className="text-sm text-slate-500">
-						Name (required), Category, Quantity, Location (or Rack/Row/Tent/Rivet Room),
-						Supplier, Reorder Level, Notes, SKU, Unit Cost
+						Name (required), Category, Quantity, Location (or
+						Rack/Row/Tent/Rivet Room), Supplier, Reorder Level, Notes, SKU, Unit
+						Cost
 					</p>
 				</div>
 			</div>

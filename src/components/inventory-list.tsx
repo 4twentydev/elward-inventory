@@ -20,9 +20,11 @@ import {
 	QrCode,
 	Search,
 	Sparkles,
+	Undo2,
 	Upload,
 	Users,
 	X,
+	Zap,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { exportToCSV, exportToExcel } from "@/lib/import-export";
@@ -38,6 +40,8 @@ import { ItemFormModal } from "./item-form-modal";
 import { ItemHistoryModal } from "./item-history-modal";
 import { LabelModal } from "./label-modal";
 import { QuarterlyCountMode } from "./quarterly-count-mode";
+import { QuickReturnModal } from "./quick-return-modal";
+import { QuickTransferModal } from "./quick-transfer-modal";
 import { TransactionModal } from "./transaction-modal";
 import { TransferModal } from "./transfer-modal";
 import { Badge } from "./ui/badge";
@@ -101,8 +105,15 @@ export function InventoryList({
 	const [showAnalytics, setShowAnalytics] = useState(false);
 	const [showUserManagement, setShowUserManagement] = useState(false);
 	const [showTransferModal, setShowTransferModal] = useState(false);
+	const [showQuickTransferModal, setShowQuickTransferModal] = useState(false);
+	const [showQuickReturnModal, setShowQuickReturnModal] = useState(false);
 	const [labelItem, setLabelItem] = useState<InventoryItem | null>(null);
 	const [transferItem, setTransferItem] = useState<InventoryItem | null>(null);
+	const [quickTransferItem, setQuickTransferItem] =
+		useState<InventoryItem | null>(null);
+	const [quickReturnItem, setQuickReturnItem] = useState<InventoryItem | null>(
+		null,
+	);
 
 	const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
 	const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
@@ -219,6 +230,18 @@ export function InventoryList({
 		setExpandedItemId(null);
 	};
 
+	const openQuickTransfer = (item: InventoryItem) => {
+		setQuickTransferItem(item);
+		setShowQuickTransferModal(true);
+		setExpandedItemId(null);
+	};
+
+	const openQuickReturn = (item: InventoryItem) => {
+		setQuickReturnItem(item);
+		setShowQuickReturnModal(true);
+		setExpandedItemId(null);
+	};
+
 	return (
 		<div className="flex-1 flex flex-col overflow-hidden">
 			{/* Header */}
@@ -229,8 +252,7 @@ export function InventoryList({
 							<h1 className="text-2xl font-bold text-white">Inventory</h1>
 							<p className="text-sm text-slate-400">
 								{items.length} item{items.length !== 1 ? "s" : ""} total
-								{categoryFilter !== "all" &&
-									` • Filtering: ${categoryFilter}`}
+								{categoryFilter !== "all" && ` • Filtering: ${categoryFilter}`}
 							</p>
 						</div>
 						{initialCategory && onClearCategory && (
@@ -252,292 +274,338 @@ export function InventoryList({
 
 			<div className="flex-1 overflow-y-auto">
 				{/* Low Stock Alert */}
-			{lowStockItems.length > 0 && !showLowStockOnly && (
-				<div className="max-w-7xl mx-auto px-4 pt-4">
-					<button
-						onClick={() => setShowLowStockOnly(true)}
-						className="w-full flex items-center gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-left hover:bg-amber-500/15 transition-colors"
-					>
-						<AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
-						<div className="flex-1">
-							<p className="font-medium text-amber-400">
-								{lowStockItems.length} item
-								{lowStockItems.length !== 1 ? "s" : ""} below reorder level
-							</p>
-							<p className="text-sm text-slate-400">
-								{lowStockItems
-									.slice(0, 3)
-									.map((i) => i.name)
-									.join(", ")}
-								{lowStockItems.length > 3 &&
-									` and ${lowStockItems.length - 3} more`}
-							</p>
-						</div>
-					</button>
-				</div>
-			)}
-
-			{/* Action Bar */}
-			<div className="max-w-7xl mx-auto px-4 py-4">
-				<div className="flex flex-wrap gap-3">
-					<Button onClick={() => setShowAddModal(true)}>
-						<Plus className="w-4 h-4" />
-						Add Item
-					</Button>
-					<Button variant="secondary" onClick={() => setShowImportModal(true)}>
-						<Upload className="w-4 h-4" />
-						Import
-					</Button>
-					<Button variant="secondary" onClick={() => setShowCountMode(true)}>
-						<ListChecks className="w-4 h-4" />
-						Count Mode
-					</Button>
-					<Button variant="secondary" onClick={() => setShowAICountModal(true)}>
-						<Sparkles className="w-4 h-4" />
-						AI Count
-					</Button>
-					<Button variant="secondary" onClick={() => setShowAssistant(true)}>
-						<MessageSquare className="w-4 h-4" />
-						Assistant
-					</Button>
-					<Button variant="secondary" onClick={() => setShowChatModal(true)}>
-						<MessageSquare className="w-4 h-4" />
-						Chat
-					</Button>
-					<div className="flex-1" />
-					<Button variant="ghost" onClick={() => setShowAnalytics(true)}>
-						<BarChart3 className="w-4 h-4" />
-						Analytics
-					</Button>
-					<Button
-						variant="ghost"
-						onClick={() => {
-							setLabelItem(null);
-							setShowLabelModal(true);
-						}}
-					>
-						<Printer className="w-4 h-4" />
-						Labels
-					</Button>
-					<Button variant="ghost" onClick={handleExportCSV}>
-						<Download className="w-4 h-4" />
-						CSV
-					</Button>
-					<Button variant="ghost" onClick={handleExportExcel}>
-						<Download className="w-4 h-4" />
-						Excel
-					</Button>
-				</div>
-			</div>
-
-			{/* Search & Filters */}
-			<div className="max-w-7xl mx-auto px-4 pb-4">
-				<div className="flex flex-col sm:flex-row gap-3">
-					<div className="relative flex-1">
-						<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-						<Input
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-							placeholder="Search items, SKUs, locations..."
-							className="pl-10"
-							inputSize="lg"
-						/>
-					</div>
-					<Select
-						value={categoryFilter}
-						onChange={(e) =>
-							setCategoryFilter(e.target.value as ItemCategory | "all")
-						}
-						className="sm:w-48"
-						selectSize="lg"
-					>
-						<option value="all">All Categories</option>
-						{CATEGORIES.map((cat) => (
-							<option key={cat} value={cat}>
-								{cat}
-							</option>
-						))}
-					</Select>
-					{showLowStockOnly && (
-						<Button
-							variant="danger"
-							onClick={() => setShowLowStockOnly(false)}
-							className="sm:w-auto"
+				{lowStockItems.length > 0 && !showLowStockOnly && (
+					<div className="max-w-7xl mx-auto px-4 pt-4">
+						<button
+							onClick={() => setShowLowStockOnly(true)}
+							className="w-full flex items-center gap-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-left hover:bg-amber-500/15 transition-colors"
 						>
-							<Filter className="w-4 h-4" />
-							Low Stock
-							<X className="w-4 h-4" />
-						</Button>
-					)}
-				</div>
-			</div>
-
-			{/* Inventory List */}
-			<div className="max-w-7xl mx-auto px-4 pb-8">
-				{filteredItems.length === 0 ? (
-					<Card className="p-12 text-center">
-						<Package className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-						<h3 className="text-lg font-medium text-slate-300 mb-2">
-							No items found
-						</h3>
-						<p className="text-slate-500 mb-4">
-							{items.length === 0
-								? "Get started by adding items or importing from a spreadsheet."
-								: "Try adjusting your search or filters."}
-						</p>
-						{items.length === 0 && (
-							<div className="flex justify-center gap-3">
-								<Button onClick={() => setShowAddModal(true)}>
-									<Plus className="w-4 h-4" />
-									Add Item
-								</Button>
-								<Button
-									variant="secondary"
-									onClick={() => setShowImportModal(true)}
-								>
-									<Upload className="w-4 h-4" />
-									Import
-								</Button>
+							<AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+							<div className="flex-1">
+								<p className="font-medium text-amber-400">
+									{lowStockItems.length} item
+									{lowStockItems.length !== 1 ? "s" : ""} below reorder level
+								</p>
+								<p className="text-sm text-slate-400">
+									{lowStockItems
+										.slice(0, 3)
+										.map((i) => i.name)
+										.join(", ")}
+									{lowStockItems.length > 3 &&
+										` and ${lowStockItems.length - 3} more`}
+								</p>
 							</div>
-						)}
-					</Card>
-				) : (
-					<div className="space-y-2">
-						{filteredItems.map((item) => {
-							const isLowStock =
-								item.quantity <= item.reorderLevel && item.reorderLevel > 0;
-							const isExpanded = expandedItemId === item.id;
-
-							return (
-								<div
-									key={item.id}
-									className={`card p-4 transition-all ${
-										isLowStock ? "border-amber-500/30" : ""
-									}`}
-								>
-									<div className="flex items-center gap-4">
-										{/* Main content */}
-										<div
-											className="flex-1 min-w-0 cursor-pointer"
-											onClick={() => openEdit(item)}
-										>
-											<div className="flex items-center gap-2 flex-wrap">
-												<h3 className="font-medium text-slate-100 truncate">
-													{item.name}
-												</h3>
-												<Badge variant={getCategoryBadgeVariant(item.category)}>
-													{item.category}
-												</Badge>
-												{isLowStock && (
-													<Badge variant="amber">
-														<AlertTriangle className="w-3 h-3" />
-														Low
-													</Badge>
-												)}
-											</div>
-											<div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
-												{item.location && <span>{item.location}</span>}
-												{item.sku && (
-													<span className="font-mono text-slate-600">
-														{item.sku}
-													</span>
-												)}
-											</div>
-										</div>
-
-										{/* Quantity */}
-										<div className="text-right shrink-0">
-											<p
-												className={`text-2xl font-mono font-bold ${
-													isLowStock ? "text-amber-400" : "text-slate-100"
-												}`}
-											>
-												{item.quantity}
-											</p>
-											{item.reorderLevel > 0 && (
-												<p className="text-xs text-slate-500">
-													Min: {item.reorderLevel}
-												</p>
-											)}
-										</div>
-
-										{/* Quick actions */}
-										<div className="flex items-center gap-1 shrink-0">
-											<button
-												onClick={() => openPull(item)}
-												className="p-3 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-colors"
-												title="Pull"
-											>
-												<Minus className="w-5 h-5" />
-											</button>
-											<button
-												onClick={() => openReturn(item)}
-												className="p-3 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-800 transition-colors"
-												title="Return"
-											>
-												<ArrowDownToLine className="w-5 h-5" />
-											</button>
-											<button
-												onClick={() =>
-													setExpandedItemId(isExpanded ? null : item.id)
-												}
-												className="p-3 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors"
-											>
-												<MoreVertical className="w-5 h-5" />
-											</button>
-										</div>
-									</div>
-
-									{/* Expanded actions */}
-									{isExpanded && (
-										<div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-800">
-											<Button
-												variant="secondary"
-												size="sm"
-												onClick={() => openCount(item)}
-											>
-												<ClipboardCheck className="w-4 h-4" />
-												Count
-											</Button>
-											<Button
-												variant="secondary"
-												size="sm"
-												onClick={() => openTransfer(item)}
-											>
-												<ArrowRightLeft className="w-4 h-4" />
-												Transfer
-											</Button>
-											<Button
-												variant="secondary"
-												size="sm"
-												onClick={() => openHistory(item)}
-											>
-												<History className="w-4 h-4" />
-												History
-											</Button>
-											<Button
-												variant="secondary"
-												size="sm"
-												onClick={() => openLabel(item)}
-											>
-												<QrCode className="w-4 h-4" />
-												Label
-											</Button>
-											<Button
-												variant="secondary"
-												size="sm"
-												onClick={() => openEdit(item)}
-											>
-												Edit Details
-											</Button>
-										</div>
-									)}
-								</div>
-							);
-						})}
+						</button>
 					</div>
 				)}
-			</div>
+
+				{/* Action Bar */}
+				<div className="max-w-7xl mx-auto px-4 py-4">
+					<div className="flex flex-wrap gap-3">
+						<Button onClick={() => setShowAddModal(true)}>
+							<Plus className="w-4 h-4" />
+							Add Item
+						</Button>
+						<Button
+							variant="primary"
+							onClick={() => {
+								alert(
+									"Click the Quick Transfer (⚡) button on any item to send it to CNC, ELU, or Shipping",
+								);
+							}}
+							className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+						>
+							<Zap className="w-4 h-4" />
+							Quick Transfer
+						</Button>
+						<Button
+							variant="primary"
+							onClick={() => {
+								alert(
+									"Click the Quick Return (↶) button on any item to return it from CNC, ELU, or Shipping",
+								);
+							}}
+							className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+						>
+							<Undo2 className="w-4 h-4" />
+							Quick Return
+						</Button>
+						<Button
+							variant="secondary"
+							onClick={() => setShowImportModal(true)}
+						>
+							<Upload className="w-4 h-4" />
+							Import
+						</Button>
+						<Button variant="secondary" onClick={() => setShowCountMode(true)}>
+							<ListChecks className="w-4 h-4" />
+							Count Mode
+						</Button>
+						<Button
+							variant="secondary"
+							onClick={() => setShowAICountModal(true)}
+						>
+							<Sparkles className="w-4 h-4" />
+							AI Count
+						</Button>
+						<Button variant="secondary" onClick={() => setShowAssistant(true)}>
+							<MessageSquare className="w-4 h-4" />
+							Assistant
+						</Button>
+						<Button variant="secondary" onClick={() => setShowChatModal(true)}>
+							<MessageSquare className="w-4 h-4" />
+							Chat
+						</Button>
+						<div className="flex-1" />
+						<Button variant="ghost" onClick={() => setShowAnalytics(true)}>
+							<BarChart3 className="w-4 h-4" />
+							Analytics
+						</Button>
+						<Button
+							variant="ghost"
+							onClick={() => {
+								setLabelItem(null);
+								setShowLabelModal(true);
+							}}
+						>
+							<Printer className="w-4 h-4" />
+							Labels
+						</Button>
+						<Button variant="ghost" onClick={handleExportCSV}>
+							<Download className="w-4 h-4" />
+							CSV
+						</Button>
+						<Button variant="ghost" onClick={handleExportExcel}>
+							<Download className="w-4 h-4" />
+							Excel
+						</Button>
+					</div>
+				</div>
+
+				{/* Search & Filters */}
+				<div className="max-w-7xl mx-auto px-4 pb-4">
+					<div className="flex flex-col sm:flex-row gap-3">
+						<div className="relative flex-1">
+							<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+							<Input
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+								placeholder="Search items, SKUs, locations..."
+								className="pl-10"
+								inputSize="lg"
+							/>
+						</div>
+						<Select
+							value={categoryFilter}
+							onChange={(e) =>
+								setCategoryFilter(e.target.value as ItemCategory | "all")
+							}
+							className="sm:w-48"
+							selectSize="lg"
+						>
+							<option value="all">All Categories</option>
+							{CATEGORIES.map((cat) => (
+								<option key={cat} value={cat}>
+									{cat}
+								</option>
+							))}
+						</Select>
+						{showLowStockOnly && (
+							<Button
+								variant="danger"
+								onClick={() => setShowLowStockOnly(false)}
+								className="sm:w-auto"
+							>
+								<Filter className="w-4 h-4" />
+								Low Stock
+								<X className="w-4 h-4" />
+							</Button>
+						)}
+					</div>
+				</div>
+
+				{/* Inventory List */}
+				<div className="max-w-7xl mx-auto px-4 pb-8">
+					{filteredItems.length === 0 ? (
+						<Card className="p-12 text-center">
+							<Package className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+							<h3 className="text-lg font-medium text-slate-300 mb-2">
+								No items found
+							</h3>
+							<p className="text-slate-500 mb-4">
+								{items.length === 0
+									? "Get started by adding items or importing from a spreadsheet."
+									: "Try adjusting your search or filters."}
+							</p>
+							{items.length === 0 && (
+								<div className="flex justify-center gap-3">
+									<Button onClick={() => setShowAddModal(true)}>
+										<Plus className="w-4 h-4" />
+										Add Item
+									</Button>
+									<Button
+										variant="secondary"
+										onClick={() => setShowImportModal(true)}
+									>
+										<Upload className="w-4 h-4" />
+										Import
+									</Button>
+								</div>
+							)}
+						</Card>
+					) : (
+						<div className="space-y-2">
+							{filteredItems.map((item) => {
+								const isLowStock =
+									item.quantity <= item.reorderLevel && item.reorderLevel > 0;
+								const isExpanded = expandedItemId === item.id;
+
+								return (
+									<div
+										key={item.id}
+										className={`card p-4 transition-all ${
+											isLowStock ? "border-amber-500/30" : ""
+										}`}
+									>
+										<div className="flex items-center gap-4">
+											{/* Main content */}
+											<div
+												className="flex-1 min-w-0 cursor-pointer"
+												onClick={() => openEdit(item)}
+											>
+												<div className="flex items-center gap-2 flex-wrap">
+													<h3 className="font-medium text-slate-100 truncate">
+														{item.name}
+													</h3>
+													<Badge
+														variant={getCategoryBadgeVariant(item.category)}
+													>
+														{item.category}
+													</Badge>
+													{isLowStock && (
+														<Badge variant="amber">
+															<AlertTriangle className="w-3 h-3" />
+															Low
+														</Badge>
+													)}
+												</div>
+												<div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
+													{item.location && <span>{item.location}</span>}
+													{item.sku && (
+														<span className="font-mono text-slate-600">
+															{item.sku}
+														</span>
+													)}
+												</div>
+											</div>
+
+											{/* Quantity */}
+											<div className="text-right shrink-0">
+												<p
+													className={`text-2xl font-mono font-bold ${
+														isLowStock ? "text-amber-400" : "text-slate-100"
+													}`}
+												>
+													{item.quantity}
+												</p>
+												{item.reorderLevel > 0 && (
+													<p className="text-xs text-slate-500">
+														Min: {item.reorderLevel}
+													</p>
+												)}
+											</div>
+
+											{/* Quick actions */}
+											<div className="flex items-center gap-1 shrink-0">
+												<button
+													onClick={() => openQuickTransfer(item)}
+													className="p-3 rounded-lg text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 transition-colors border border-blue-500/20"
+													title="Quick Transfer to CNC/ELU/Shipping"
+												>
+													<Zap className="w-5 h-5" />
+												</button>
+												<button
+													onClick={() => openQuickReturn(item)}
+													className="p-3 rounded-lg text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition-colors border border-emerald-500/20"
+													title="Quick Return from CNC/ELU/Shipping"
+												>
+													<Undo2 className="w-5 h-5" />
+												</button>
+												<button
+													onClick={() => openPull(item)}
+													className="p-3 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-colors"
+													title="Pull"
+												>
+													<Minus className="w-5 h-5" />
+												</button>
+												<button
+													onClick={() => openReturn(item)}
+													className="p-3 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-800 transition-colors"
+													title="Return"
+												>
+													<ArrowDownToLine className="w-5 h-5" />
+												</button>
+												<button
+													onClick={() =>
+														setExpandedItemId(isExpanded ? null : item.id)
+													}
+													className="p-3 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors"
+												>
+													<MoreVertical className="w-5 h-5" />
+												</button>
+											</div>
+										</div>
+
+										{/* Expanded actions */}
+										{isExpanded && (
+											<div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-800">
+												<Button
+													variant="secondary"
+													size="sm"
+													onClick={() => openCount(item)}
+												>
+													<ClipboardCheck className="w-4 h-4" />
+													Count
+												</Button>
+												<Button
+													variant="secondary"
+													size="sm"
+													onClick={() => openTransfer(item)}
+												>
+													<ArrowRightLeft className="w-4 h-4" />
+													Transfer
+												</Button>
+												<Button
+													variant="secondary"
+													size="sm"
+													onClick={() => openHistory(item)}
+												>
+													<History className="w-4 h-4" />
+													History
+												</Button>
+												<Button
+													variant="secondary"
+													size="sm"
+													onClick={() => openLabel(item)}
+												>
+													<QrCode className="w-4 h-4" />
+													Label
+												</Button>
+												<Button
+													variant="secondary"
+													size="sm"
+													onClick={() => openEdit(item)}
+												>
+													Edit Details
+												</Button>
+											</div>
+										)}
+									</div>
+								);
+							})}
+						</div>
+					)}
+				</div>
 			</div>
 
 			{/* Modals */}
@@ -585,6 +653,16 @@ export function InventoryList({
 				isOpen={showTransferModal}
 				onClose={() => setShowTransferModal(false)}
 				item={transferItem}
+			/>
+			<QuickTransferModal
+				isOpen={showQuickTransferModal}
+				onClose={() => setShowQuickTransferModal(false)}
+				item={quickTransferItem}
+			/>
+			<QuickReturnModal
+				isOpen={showQuickReturnModal}
+				onClose={() => setShowQuickReturnModal(false)}
+				item={quickReturnItem}
 			/>
 			<QuarterlyCountMode
 				isOpen={showCountMode}
