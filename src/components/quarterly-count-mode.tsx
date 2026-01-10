@@ -12,6 +12,7 @@ import {
 	Search,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { getLocationTerm } from "@/lib/location-terminology";
 import type { InventoryItem, ItemCategory } from "@/types";
 import { useInventory } from "./inventory-context";
 import { Badge } from "./ui/badge";
@@ -20,7 +21,6 @@ import { Card, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Modal } from "./ui/modal";
 import { Select } from "./ui/select";
-import { getLocationTerm } from "@/lib/location-terminology";
 
 interface CountModeProps {
 	isOpen: boolean;

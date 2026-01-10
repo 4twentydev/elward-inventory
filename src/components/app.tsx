@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import type { ItemCategory } from "@/types";
+import { AnalyticsDashboard } from "./analytics-dashboard";
+import { Dashboard } from "./dashboard";
 import { useInventory } from "./inventory-context";
 import { InventoryList } from "./inventory-list";
 import { LoginScreen } from "./login-screen";
-import { Sidebar } from "./sidebar";
-import { Dashboard } from "./dashboard";
-import { AnalyticsDashboard } from "./analytics-dashboard";
 import { QuarterlyCountMode } from "./quarterly-count-mode";
+import { Sidebar } from "./sidebar";
 import { UserManagement } from "./user-management";
-import type { ItemCategory } from "@/types";
 
 type ViewType = "dashboard" | "inventory" | "analytics" | "count" | "users";
 

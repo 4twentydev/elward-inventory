@@ -1,7 +1,7 @@
 "use client";
 
-import { useInventory } from "./inventory-context";
 import type { ReactNode } from "react";
+import { useInventory } from "./inventory-context";
 
 interface SidebarProps {
 	currentView: string;

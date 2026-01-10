@@ -1,7 +1,8 @@
 "use client";
 
-import { Eye, Plus, Shield, Trash2, User } from "lucide-react";
+import { AlertTriangle, Eye, Plus, Shield, Trash2, User } from "lucide-react";
 import { useEffect, useState } from "react";
+import { resetAllData } from "@/actions/admin";
 import * as store from "@/lib/store";
 import type { User as UserType } from "@/types";
 import { useInventory } from "./inventory-context";
@@ -20,6 +21,8 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
 	const { currentUser } = useInventory();
 	const [users, setUsers] = useState<UserType[]>([]);
 	const [showAddForm, setShowAddForm] = useState(false);
+	const [showResetConfirm, setShowResetConfirm] = useState(false);
+	const [isResetting, setIsResetting] = useState(false);
 	const [newUser, setNewUser] = useState({
 		name: "",
 		pin: "",
@@ -60,6 +63,24 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
 			JSON.stringify(updatedUsers),
 		);
 		setUsers(updatedUsers);
+	};
+
+	const handleResetAllData = async () => {
+		setIsResetting(true);
+		try {
+			// Reset database if configured
+			await resetAllData();
+
+			// Reset localStorage
+			store.clearAllData();
+
+			// Reload the page to reset the app state
+			window.location.reload();
+		} catch (error) {
+			console.error("Error resetting data:", error);
+			setIsResetting(false);
+			setShowResetConfirm(false);
+		}
 	};
 
 	const getRoleBadge = (role: string) => {
@@ -206,7 +227,90 @@ export function UserManagement({ isOpen, onClose }: UserManagementProps) {
 				<p className="text-sm text-slate-500">
 					Users log in with their PIN. Deactivated users cannot log in.
 				</p>
+
+				{/* Reset All Data Section */}
+				<div className="pt-6 mt-6 border-t border-slate-800">
+					<div className="bg-rose-950/20 border border-rose-900/50 rounded-lg p-4">
+						<div className="flex items-start gap-3">
+							<AlertTriangle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
+							<div className="flex-1">
+								<h3 className="font-medium text-rose-400 mb-1">Danger Zone</h3>
+								<p className="text-sm text-slate-400 mb-3">
+									Reset all data including inventory items, transactions,
+									counts, and users. This action cannot be undone. The default
+									admin user (PIN: 1234) will be recreated.
+								</p>
+								<Button
+									variant="danger"
+									onClick={() => setShowResetConfirm(true)}
+								>
+									<Trash2 className="w-4 h-4" />
+									Reset All Data
+								</Button>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
+
+			{/* Reset Confirmation Modal */}
+			{showResetConfirm && (
+				<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
+					<div className="bg-slate-900 border border-slate-800 rounded-lg p-6 max-w-md mx-4">
+						<div className="flex items-center gap-3 mb-4">
+							<div className="w-12 h-12 bg-rose-950/50 rounded-full flex items-center justify-center">
+								<AlertTriangle className="w-6 h-6 text-rose-400" />
+							</div>
+							<div>
+								<h3 className="font-semibold text-slate-200">Confirm Reset</h3>
+								<p className="text-sm text-slate-500">
+									This action cannot be undone
+								</p>
+							</div>
+						</div>
+						<p className="text-slate-300 mb-6">
+							Are you sure you want to reset ALL data? This will permanently
+							delete:
+						</p>
+						<ul className="list-disc list-inside text-sm text-slate-400 mb-6 space-y-1">
+							<li>All inventory items</li>
+							<li>All transactions and history</li>
+							<li>All count records and sessions</li>
+							<li>All AI count logs</li>
+							<li>All users (except default admin)</li>
+							<li>All chat messages</li>
+						</ul>
+						<div className="flex gap-3">
+							<Button
+								variant="secondary"
+								onClick={() => setShowResetConfirm(false)}
+								disabled={isResetting}
+								className="flex-1"
+							>
+								Cancel
+							</Button>
+							<Button
+								variant="danger"
+								onClick={handleResetAllData}
+								disabled={isResetting}
+								className="flex-1"
+							>
+								{isResetting ? (
+									<>
+										<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+										Resetting...
+									</>
+								) : (
+									<>
+										<Trash2 className="w-4 h-4" />
+										Yes, Reset Everything
+									</>
+								)}
+							</Button>
+						</div>
+					</div>
+				</div>
+			)}
 		</Modal>
 	);
 }
