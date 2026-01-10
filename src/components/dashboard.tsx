@@ -1,9 +1,9 @@
 "use client";
 
-import { useInventory } from "./inventory-context";
-import type { ItemCategory, InventoryItem, Transaction } from "@/types";
 import { useState } from "react";
 import { getTransactions } from "@/lib/store";
+import type { InventoryItem, ItemCategory, Transaction } from "@/types";
+import { useInventory } from "./inventory-context";
 
 interface CategoryMetrics {
 	category: ItemCategory;
