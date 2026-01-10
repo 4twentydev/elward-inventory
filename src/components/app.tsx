@@ -51,13 +51,22 @@ export function App() {
 					/>
 				)}
 				{currentView === "analytics" && (
-					<AnalyticsDashboard isOpen={true} onClose={() => setCurrentView("dashboard")} />
+					<AnalyticsDashboard
+						isOpen={true}
+						onClose={() => setCurrentView("dashboard")}
+					/>
 				)}
 				{currentView === "count" && (
-					<QuarterlyCountMode isOpen={true} onClose={() => setCurrentView("dashboard")} />
+					<QuarterlyCountMode
+						isOpen={true}
+						onClose={() => setCurrentView("dashboard")}
+					/>
 				)}
 				{currentView === "users" && currentUser.role === "admin" && (
-					<UserManagement isOpen={true} onClose={() => setCurrentView("dashboard")} />
+					<UserManagement
+						isOpen={true}
+						onClose={() => setCurrentView("dashboard")}
+					/>
 				)}
 			</div>
 		</div>

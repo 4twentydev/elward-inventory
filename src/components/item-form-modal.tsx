@@ -161,7 +161,9 @@ export function ItemFormModal({ isOpen, onClose, item }: ItemFormModalProps) {
 						</label>
 						<Input
 							value={formData.location}
-							onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+							onChange={(e) =>
+								setFormData({ ...formData, location: e.target.value })
+							}
 							placeholder={getLocationPlaceholder(formData.category)}
 							inputSize="lg"
 						/>

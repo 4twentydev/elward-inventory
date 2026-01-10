@@ -503,7 +503,8 @@ export function QuarterlyCountMode({ isOpen, onClose }: CountModeProps) {
 										</h2>
 										{currentItem.location && (
 											<p className="text-slate-400 mt-1">
-												📍 {getLocationTerm(currentItem.category)}: {currentItem.location}
+												📍 {getLocationTerm(currentItem.category)}:{" "}
+												{currentItem.location}
 											</p>
 										)}
 									</div>
